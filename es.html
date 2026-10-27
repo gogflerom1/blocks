@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#EEF1F8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Español Blocks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@500;700;800;900&family=Onest:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: "baseplate" app — dotted grid ground, sentence parts are colour-coded studded blocks; top bar + view, bottom tab bar on phones */
+:root{
+  --bg:#EEF1F8; --surface:#FFFFFF; --surface2:#F5F7FC; --ink:#151A30; --muted:#5C6584; --line:#DBE0EE; --grid:#CFD6E8;
+  --c-s:#4D5BFF; --c-v:#FF5A47; --c-o:#0FA98F; --c-p:#F29D0C; --c-t:#9A55F5; --c-x:#EE3E93; --c-q:#1694E8; --c-a:#5E6E8C; --c-n:#2B2F45; --c-l:#0E9FC2; --c-m:#7E8F1F; --c-k:#D946EF;
+  --ok:#12A660; --bad:#E5362C; --okbg:#E3F6EC; --badbg:#FDE8E6;
+  --shadow:0 1px 2px rgba(21,26,48,.06),0 8px 24px rgba(21,26,48,.07);
+  --f-display:'Geologica','Onest',system-ui,sans-serif;
+  --f-body:'Onest',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-en:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1020; --surface:#161A2D; --surface2:#1D2238; --ink:#EEF1FB; --muted:#9AA3C6; --line:#293050; --grid:#20263F;
+  --c-a:#7D8CAB; --c-n:#4A5070; --okbg:#10291E; --badbg:#2E1416; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1020; --surface:#161A2D; --surface2:#1D2238; --ink:#EEF1FB; --muted:#9AA3C6; --line:#293050; --grid:#20263F;
+  --c-a:#7D8CAB; --c-n:#4A5070; --okbg:#10291E; --badbg:#2E1416; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  background-image:radial-gradient(var(--grid) 1.6px,transparent 1.8px);background-size:22px 22px;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--c-s);outline-offset:2px;border-radius:8px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+.en{font-family:var(--f-en);font-weight:400}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:18px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:900;font-size:18px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.brand svg{width:30px;height:30px}
+.nav{display:flex;gap:4px;flex:1;min-width:0}
+.nav a{display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:10px;text-decoration:none;color:var(--muted);font-weight:600;font-size:14px;white-space:nowrap;transition:background .2s,color .2s}
+.nav a svg{width:18px;height:18px;flex:none}
+.nav a:hover{background:var(--surface2);color:var(--ink)}
+.nav a.on{background:var(--ink);color:var(--surface)}
+.stats{display:flex;gap:8px;align-items:center}
+.stat{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat svg{width:16px;height:16px}
+.stat.bump{animation:bump .5s cubic-bezier(.3,1.7,.5,1)}
+
+main{max-width:1200px;margin:0 auto;padding-block:28px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{animation:viewIn .45s cubic-bezier(.2,1,.3,1)}
+
+/* tab bar (phones) */
+.tabbar{display:none}
+
+/* blocks */
+.blk{--r:var(--c-s);position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:9px 14px 10px;margin-top:6px;border-radius:10px;background:var(--r);color:#fff;font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.1;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2),0 2px 0 rgba(0,0,0,.06);white-space:nowrap}
+.blk::before{content:"";position:absolute;top:-5px;left:10px;width:12px;height:6px;border-radius:6px 6px 0 0;background:var(--r);box-shadow:18px 0 0 var(--r)}
+.blk small{font-family:var(--f-mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.r-s{--r:var(--c-s)}.r-v{--r:var(--c-v)}.r-o{--r:var(--c-o)}.r-p{--r:var(--c-p)}.r-t{--r:var(--c-t)}.r-x{--r:var(--c-x)}.r-q{--r:var(--c-q)}.r-a{--r:var(--c-a)}.r-n{--r:var(--c-n)}
+.blk.plus{background:none;color:var(--muted);box-shadow:none;padding:9px 2px;font-weight:700}
+.blk.plus::before{display:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+
+/* generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.eyebrow{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:11px 18px;font-weight:700;font-size:15px;background:var(--ink);color:var(--surface);box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);transition:transform .15s,filter .15s;text-decoration:none}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.btn:active{transform:translateY(1px)}
+.btn.c{background:var(--c-s);color:#fff}
+.btn.ghost{background:var(--surface2);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.sm{padding:7px 12px;font-size:13px;border-radius:10px}
+.btn svg{width:18px;height:18px}
+.ico{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);transition:transform .15s,background .15s;flex:none}
+.ico:hover{transform:scale(1.08);background:var(--surface)}
+.ico svg{width:17px;height:17px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13px;white-space:nowrap;transition:all .15s}
+.chip:hover{border-color:var(--muted)}
+.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip .dot{width:9px;height:9px;border-radius:3px;background:var(--r,var(--muted))}
+.chip b{font-family:var(--f-mono);font-size:11px;opacity:.7}
+.tip{display:flex;gap:12px;padding:14px 16px;border-radius:14px;background:var(--surface2);border:1px dashed var(--line);font-size:15px}
+.tip svg{width:22px;height:22px;flex:none;color:var(--c-p)}
+.say{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:0;text-align:left}
+.say svg{width:16px;height:16px;color:var(--c-s);flex:none}
+.say:hover .en{text-decoration:underline;text-decoration-color:var(--c-s);text-underline-offset:4px}
+.sec-h{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;max-width:760px}
+.sec-h h1{font-size:clamp(30px,4.4vw,48px);font-weight:900;line-height:1.02}
+.sec-h p{color:var(--muted);font-size:17px;max-width:62ch}
+
+/* START */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:32px;align-items:center;margin-bottom:34px}
+.hero h1{font-size:clamp(38px,6vw,74px);font-weight:900;line-height:.98;letter-spacing:-.025em}
+.hero h1 em{font-family:var(--f-en);font-weight:400;font-style:italic;letter-spacing:0;color:var(--c-v)}
+.hero-copy{display:flex;flex-direction:column;gap:18px}
+.hero-copy>p{font-size:18px;color:var(--muted);max-width:44ch}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.plate{position:relative;padding:28px 22px 22px;border-radius:24px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);min-height:250px;display:flex;flex-direction:column;justify-content:center;gap:18px;overflow:hidden;cursor:pointer}
+.plate .lane{display:flex;flex-wrap:wrap;gap:10px 8px;align-items:flex-end;min-height:76px}
+.plate .blk{font-size:clamp(16px,2.1vw,22px);padding:12px 16px 13px}
+.plate .blk.drop{animation:drop .6s cubic-bezier(.3,1.5,.5,1) both}
+.plate .ru{font-size:16px;color:var(--muted);min-height:1.5em;transition:opacity .4s}
+.plate .meta{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--r)}
+.path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:28px}
+.step{position:relative;padding:20px;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:var(--ink);transition:transform .2s,box-shadow .2s}
+.step:hover{transform:translateY(-4px)}
+.step .num{font-family:var(--f-display);font-weight:900;font-size:42px;line-height:1;color:var(--r)}
+.step h3{font-size:20px}
+.step p{color:var(--muted);font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:var(--r,var(--c-s));border-radius:99px;transition:width 1s cubic-bezier(.2,1,.3,1)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{padding:18px 20px;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:var(--f-display);font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi span{color:var(--muted);font-size:13px}
+
+/* BUILD */
+.build{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;align-items:start}
+.lessons{display:flex;flex-direction:column;gap:6px;position:sticky;top:84px}
+.lessons button{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid transparent;background:none;transition:background .15s}
+.lessons button:hover{background:var(--surface)}
+.lessons button.on{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.lessons .n{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:var(--surface2);border:1px solid var(--line);font-family:var(--f-display);font-weight:800;flex:none}
+.lessons button.done .n{background:var(--ok);color:#fff;border-color:var(--ok)}
+.lessons button.on .n{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.lessons strong{display:block;font-size:14px;line-height:1.25}
+.lessons small{color:var(--muted);font-size:12px}
+.lesson{display:flex;flex-direction:column;gap:20px}
+.lesson-head{padding:26px;display:flex;flex-direction:column;gap:16px}
+.lesson-head h2{font-size:clamp(24px,3vw,34px);font-weight:900}
+.lesson-head .body{font-size:17px;max-width:66ch}
+.lesson-head .body b{font-weight:700}
+.formula{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:16px;border-radius:14px;background:var(--surface2)}
+.exlist{display:flex;flex-direction:column;gap:10px}
+.exl{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
+.exl .en{font-size:23px;line-height:1.2}
+.exl .ru{color:var(--muted);font-size:14px}
+.auxt{width:100%;border-collapse:collapse;font-size:14px}
+.auxt th,.auxt td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.auxt th{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tbl{overflow-x:auto}
+.ex{padding:22px;display:flex;flex-direction:column;gap:14px;transition:border-color .3s,background .3s}
+.ex.ok{border-color:var(--ok);background:linear-gradient(var(--okbg),var(--okbg)) padding-box}
+.ex-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ex-ru{font-size:18px;font-weight:600}
+.ex-ru span{color:var(--muted);font-weight:500;font-size:14px;display:block}
+.slot{min-height:66px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:12px;border-radius:14px;border:2px dashed var(--line);background:var(--surface2);transition:border-color .2s}
+.slot:empty::after{content:"Нажимай на кубики снизу, чтобы собрать предложение";color:var(--muted);font-size:14px;align-self:center}
+.pool{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;min-height:52px}
+.pool .blk,.slot .blk{border:0;cursor:pointer;transition:transform .15s,filter .15s}
+.pool .blk:hover,.slot .blk:hover{transform:translateY(-3px);filter:brightness(1.08)}
+.blk.pop{animation:pop .3s cubic-bezier(.3,1.7,.5,1)}
+.blk.wrong{outline:3px solid var(--bad);outline-offset:2px;animation:shake .4s}
+.ex-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ex-msg{font-weight:600;font-size:14px}
+.ex-msg.good{color:var(--ok)}.ex-msg.badm{color:var(--bad)}
+.shake{animation:shake .45s}
+
+/* TENSES */
+.matrix{display:grid;grid-template-columns:110px repeat(4,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.mh{padding:10px 12px;border-radius:14px;display:flex;flex-direction:column;gap:3px}
+.mh b{font-family:var(--f-display);font-size:16px}
+.mh span{font-size:12px;color:var(--muted)}
+.mh code{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--r)}
+.mrow{display:flex;align-items:center;font-family:var(--f-display);font-weight:800;font-size:15px;padding:0 6px}
+.cell{position:relative;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:4px;min-height:96px;transition:transform .18s,box-shadow .18s,border-color .18s}
+.cell::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:var(--r)}
+.cell:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.cell.on{border-color:var(--r);box-shadow:0 0 0 2px var(--r),var(--shadow)}
+.cell b{font-family:var(--f-display);font-size:15px;padding-right:38px}
+.cell .en{font-size:17px;color:var(--muted);line-height:1.2}
+.cell .star{position:absolute;top:10px;right:10px;font-family:var(--f-mono);font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:var(--c-p);color:#fff}
+.cell.hl{animation:glow 1s ease 2}
+.detect{padding:18px 20px;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;margin-bottom:22px}
+.detect .grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.detect .grp>span{font-weight:700;margin-right:4px}
+.tdetail{padding:26px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:26px;scroll-margin-top:90px}
+.tdetail h2{font-size:clamp(28px,3.4vw,40px);font-weight:900}
+.tdetail .runame{color:var(--muted);font-weight:600}
+.tcol{display:flex;flex-direction:column;gap:16px;min-width:0}
+.idea{font-size:18px;font-weight:600;line-height:1.4}
+.tl{width:100%;height:auto;display:block;background:var(--surface2);border-radius:14px}
+.tl text{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.tl .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.1s cubic-bezier(.4,0,.2,1) forwards}
+.tl .popin{transform-box:fill-box;transform-origin:center;animation:popin .5s cubic-bezier(.3,1.7,.5,1) both}
+.forms{display:grid;gap:8px}
+.form{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--surface2)}
+.form .sg{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;font-family:var(--f-display);font-weight:900;font-size:18px;color:#fff;background:var(--r)}
+.form code{font-family:var(--f-mono);font-size:14px;font-weight:500;overflow-wrap:anywhere}
+.sigs{display:flex;flex-wrap:wrap;gap:6px}
+.sigs span{font-family:var(--f-mono);font-size:12px;padding:4px 9px;border-radius:8px;background:var(--surface2);border:1px solid var(--line)}
+.quiz{display:flex;flex-direction:column;gap:14px}
+.qi{display:flex;flex-direction:column;gap:8px}
+.qi .qs{font-size:20px}
+.qi .qs .en{font-size:22px}
+.qopts{display:flex;flex-wrap:wrap;gap:8px}
+.qopt{padding:9px 14px;border-radius:11px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;font-size:15px;transition:all .15s}
+.qopt:hover:not(:disabled){border-color:var(--ink);transform:translateY(-2px)}
+.qopt.right{background:var(--ok);border-color:var(--ok);color:#fff;animation:pop .35s cubic-bezier(.3,1.7,.5,1)}
+.qopt.no{background:var(--badbg);border-color:var(--bad);color:var(--bad);animation:shake .4s}
+.qopt:disabled{cursor:default}
+.why{font-size:14px;color:var(--muted)}
+.why.good{color:var(--ok)}
+.irr{padding:20px;margin-top:22px}
+.irr summary{cursor:pointer;font-family:var(--f-display);font-weight:800;font-size:20px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.irr summary::-webkit-details-marker{display:none}
+.irr summary span{font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted)}
+.irrg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:16px}
+.irrg button{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);text-align:left;font-size:14px;transition:transform .15s}
+.irrg button:hover{transform:translateY(-2px)}
+.irrg em{font-style:normal;font-family:var(--f-mono);font-size:10px;color:var(--muted);display:block}
+
+/* WORDS */
+.wtools{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.search{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search input{flex:1;min-width:200px;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+.cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.wotd{padding:22px 24px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;margin-bottom:18px;position:relative;overflow:hidden}
+.wotd .big{font-family:var(--f-en);font-size:clamp(40px,6vw,64px);line-height:1}
+.wotd::after{content:"";position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:30px;background:var(--r);opacity:.12;transform:rotate(18deg)}
+.wgrid{align-items:start;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.w{position:relative;text-align:left;padding:14px 40px 14px 20px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:3px;transition:transform .18s,box-shadow .18s;min-width:0}
+.w::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:0 4px 4px 0;background:var(--r)}
+.w:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.w .wd{font-family:var(--f-en);font-size:26px;line-height:1.1;overflow-wrap:anywhere}
+.w .tr{color:var(--muted);font-size:14px}
+.w .more{display:none;flex-direction:column;gap:10px;margin-top:8px;padding-top:10px;border-top:1px dashed var(--line)}
+.w.open{grid-column:span 2}
+.w.open .more{display:flex;animation:viewIn .3s ease}
+.w .exs{font-family:var(--f-en);font-size:20px;line-height:1.3}
+.w .acts{display:flex;gap:6px;flex-wrap:wrap}
+.w .kn{position:absolute;top:12px;right:34px;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:var(--ok);color:#fff}
+.w .kn svg{width:14px;height:14px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+/* TRAIN */
+.modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.mode{text-align:left;padding:18px;display:flex;flex-direction:column;gap:8px;border:2px solid transparent;transition:transform .18s,border-color .18s}
+.mode:hover{transform:translateY(-3px)}
+.mode.on{border-color:var(--r)}
+.mode .mi{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--r);color:#fff}
+.mode .mi svg{width:22px;height:22px}
+.mode b{font-family:var(--f-display);font-size:17px}
+.mode span{font-size:13px;color:var(--muted)}
+.trainbox{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
+.arena{padding:24px;display:flex;flex-direction:column;gap:18px;min-height:420px}
+.prog{display:flex;align-items:center;gap:12px}
+.prog .bar{flex:1}
+.prog span{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.flip{perspective:1200px;min-height:250px;cursor:pointer}
+.flip-in{position:relative;min-height:250px;transition:transform .6s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;background:var(--surface2);border:1px solid var(--line)}
+.face.back{transform:rotateY(180deg);background:var(--surface);border:2px solid var(--r,var(--c-s))}
+.face .lbl{position:absolute;top:14px;left:16px}
+.face .big{font-family:var(--f-en);font-size:clamp(34px,5vw,52px);line-height:1.05}
+.face .ruw{font-size:clamp(22px,3vw,30px);font-weight:700;font-family:var(--f-display)}
+.face .exs{font-family:var(--f-en);font-size:19px;color:var(--muted);max-width:40ch}
+.grade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grade button{padding:13px 10px;border-radius:12px;border:0;font-weight:700;color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2);transition:transform .15s}
+.grade button:hover{transform:translateY(-2px)}
+.g0{background:var(--bad)}.g1{background:var(--c-p)}.g2{background:var(--ok)}
+.mcq{display:flex;flex-direction:column;gap:16px}
+.mcq .prompt{font-size:clamp(22px,3vw,28px);line-height:1.3}
+.mcq .prompt .en{font-size:1.1em}
+.gap{display:inline-block;min-width:90px;border-bottom:3px solid var(--c-s);text-align:center;color:var(--c-s);font-family:var(--f-en)}
+.mopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mopts .qopt{padding:14px;font-size:17px;text-align:left}
+.mopts .qopt .en{font-size:21px}
+.side{padding:20px;display:flex;flex-direction:column;gap:14px}
+.boxes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:end;height:150px}
+.boxes div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}
+.boxes i{width:100%;border-radius:8px 8px 4px 4px;background:var(--r);min-height:4px;transition:height .8s cubic-bezier(.2,1,.3,1)}
+.boxes b{font-family:var(--f-mono);font-size:11px;font-variant-numeric:tabular-nums}
+.boxes span{font-size:10px;color:var(--muted);text-align:center;line-height:1.1}
+.done{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;min-height:360px}
+.done .score{font-family:var(--f-display);font-size:64px;font-weight:900;line-height:1}
+
+/* SCIENCE */
+.sci{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.fact{padding:22px;display:flex;flex-direction:column;gap:10px}
+.fact .num{font-family:var(--f-display);font-weight:900;font-size:clamp(36px,5vw,54px);line-height:1;color:var(--r)}
+.fact h3{font-size:19px}
+.fact p{color:var(--muted);font-size:15px}
+.fact cite{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px;margin-top:auto}
+.how{padding:24px;margin-top:14px;display:flex;flex-direction:column;gap:12px}
+.how ol{margin:0;padding-left:22px;display:grid;gap:8px}
+
+/* youth layer: aurora, ticker, stickers, chat */
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.34;animation:drift 24s ease-in-out infinite}
+.aurora i:nth-child(1){width:46vmax;height:46vmax;left:-12vmax;top:-10vmax;background:var(--c-t)}
+.aurora i:nth-child(2){width:40vmax;height:40vmax;right:-10vmax;top:18vh;background:var(--c-x);animation-delay:-8s}
+.aurora i:nth-child(3){width:38vmax;height:38vmax;left:24vw;bottom:-16vmax;background:var(--c-l);animation-delay:-15s}
+@keyframes drift{50%{transform:translate(6vmax,4vmax) scale(1.15)}}
+.hero{position:relative}
+.hero>*:not(.stickers){position:relative;z-index:1}
+.stickers{position:absolute;inset:0;pointer-events:none;z-index:0}
+.stickers svg{position:absolute;animation:floaty 6s ease-in-out infinite}
+.stickers .a{right:5%;top:-14px;width:58px;color:var(--c-p)}
+.stickers .b{left:44%;bottom:-8px;width:46px;color:var(--c-x);animation-delay:-2s}
+.stickers .c{right:46%;top:-6px;width:34px;color:var(--c-o);animation-delay:-4s}
+@keyframes floaty{50%{transform:translateY(-14px) rotate(14deg)}}
+.hero h1 em{background:linear-gradient(90deg,var(--c-v),var(--c-x),var(--c-t),var(--c-q),var(--c-v));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 7s linear infinite}
+@keyframes shine{to{background-position:300% 0}}
+.ticker{overflow:hidden;margin:0 0 26px;transform:rotate(-1deg);background:var(--ink);color:var(--surface);border-radius:14px;padding:11px 0;box-shadow:var(--shadow)}
+.ticker-in{display:flex;width:max-content;animation:marq 46s linear infinite;font-family:var(--f-display);font-weight:800;font-size:18px;white-space:nowrap}
+.ticker:hover .ticker-in{animation-play-state:paused}
+.ticker-in span{display:inline-flex;align-items:center;gap:26px;padding-right:26px}
+.ticker-in span::after{content:"";width:10px;height:10px;border-radius:3px;background:var(--c);transform:rotate(45deg)}
+@keyframes marq{to{transform:translateX(-50%)}}
+.btn{transition:transform .18s cubic-bezier(.3,1.8,.5,1),filter .15s}
+.btn:hover{transform:translateY(-3px) rotate(-1deg) scale(1.03)}
+.chip{transition:transform .18s cubic-bezier(.3,1.8,.5,1),all .15s}
+.chip:hover{transform:translateY(-2px)}
+.banners{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:14px}
+.banners .gbanner{margin:0}
+.banners .gbanner:hover{transform:translateY(-3px) rotate(-.4deg)}
+.gbanner{transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.wgrid .w{animation:cardIn .5s cubic-bezier(.2,1.3,.4,1) backwards;animation-delay:calc(var(--i,0)*22ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.96)}}
+.exru{font-size:13px;color:var(--muted);margin:2px 0 0;font-family:var(--f-body)}
+.chatx{padding:10px 12px;border-radius:14px 14px 14px 4px;background:linear-gradient(135deg,color-mix(in srgb,var(--c-s) 12%,var(--surface)),var(--surface2));border:1px solid var(--line)}
+.chatx .exs{font-size:18px}
+.lbl2{display:block;font-family:var(--f-mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--c-s);margin-bottom:3px}
+.gate{padding:30px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;border:2px dashed var(--bad)}
+.gate h3{font-size:26px}
+.gate p{color:var(--muted);max-width:60ch}
+.ladder{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:22px}
+.rg{padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--r);display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.rg:hover{transform:translateY(-3px)}
+.rg b{font-family:var(--f-display);font-size:14px}
+.rg span{font-family:var(--f-en);font-size:18px;line-height:1.15}
+.talk{display:grid;grid-template-columns:270px minmax(0,1fr);gap:22px;align-items:start}
+.scenes{display:flex;flex-direction:column;gap:6px;position:sticky;top:84px}
+.scenes button{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 14px;border-radius:14px;border:1px solid transparent;background:none;transition:background .15s,transform .18s cubic-bezier(.3,1.6,.5,1)}
+.scenes button:hover{background:var(--surface);transform:translateX(3px)}
+.scenes button.on{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.scenes .n{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--r);color:#fff;font-family:var(--f-display);font-weight:800;flex:none}
+.scenes button.done .n{background:var(--ok)}
+.scenes strong{display:block;font-size:14px;line-height:1.2}
+.scenes small{color:var(--muted);font-size:12px}
+.phone{max-width:560px;width:100%;margin:0 auto;border-radius:36px;border:8px solid var(--ink);background:var(--surface);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;min-height:560px}
+.ph-top{display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(135deg,var(--c-s),var(--c-t) 60%,var(--c-x));color:#fff}
+.ph-top b{font-family:var(--f-display);display:block}
+.ph-top small{opacity:.85;font-size:12px}
+.msgs{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:400px;max-height:62vh;overflow-y:auto;background:var(--surface2)}
+.msg{display:flex;gap:8px;align-items:flex-end;max-width:90%;animation:msgIn .4s cubic-bezier(.3,1.5,.5,1) both}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:13px;color:#fff;flex:none;background:var(--ac)}
+.bub{padding:10px 14px;border-radius:18px 18px 18px 6px;background:var(--surface);border:1px solid var(--line);font-size:17px;line-height:1.35;cursor:pointer;text-align:left;transition:transform .15s}
+.bub:hover{transform:scale(1.015)}
+.msg.me .bub{border-radius:18px 18px 6px 18px;background:linear-gradient(135deg,var(--c-s),var(--c-t));color:#fff;border:0}
+.bub .ru{display:block;font-size:13px;opacity:.78;margin-top:4px}
+.msgs.notr .bub .ru{display:none}
+.term{border:0;background:color-mix(in srgb,var(--c-p) 30%,transparent);color:inherit;padding:0 4px;border-radius:5px;font:inherit;font-weight:700;border-bottom:2px solid var(--c-p);cursor:pointer}
+.msg.me .term{background:rgba(255,255,255,.22);border-bottom-color:#fff}
+.typing{display:flex;gap:4px;padding:13px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);width:fit-content}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{40%{transform:translateY(-5px);opacity:.4}}
+@keyframes msgIn{from{opacity:0;transform:translateY(16px) scale(.9)}}
+.ph-bar{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+/* chat trainer */
+.cmodes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.ph-top .streak{margin-left:auto;display:flex;gap:6px;align-items:center;background:rgba(255,255,255,.22);padding:6px 12px;border-radius:999px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ph-top .streak svg{width:16px;height:16px}
+.cpanel{padding:14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.ctask p{font-size:19px;font-weight:600;line-height:1.3}
+.cpanel .slot{min-height:56px;padding:10px}
+.cpanel .pool{min-height:44px}
+.opts{display:grid;gap:8px}
+.opts .qopt{padding:12px 14px;text-align:left;font-size:17px}
+.opts .qopt .en{font-size:20px}
+.cwrap{max-width:620px;margin:0 auto}
+.chatbest{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-align:center;margin-top:10px}
+
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px}
+@media (max-width:720px){.tgrid{grid-template-columns:minmax(0,1fr)}}
+.lang{display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;background:var(--ink);color:var(--surface);font-weight:800;font-size:13px;text-decoration:none;white-space:nowrap;flex:none;transition:transform .18s cubic-bezier(.3,1.8,.5,1)}
+.lang:hover{transform:translateY(-2px)}
+@media (max-width:720px){
+  .top{position:static}
+  .modes,.games{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .mode{padding:12px;gap:6px}
+  .mode .mi{width:32px;height:32px;border-radius:9px}
+  .mode .mi svg{width:18px;height:18px}
+  .mode b{font-size:14px;line-height:1.15}
+  .mode span:last-child{font-size:11.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .lesson,.cwrap,#tdetail,#ask{scroll-margin-top:12px}
+}
+.top-in{gap:8px}
+@media (max-width:520px){.brand{font-size:15px}.stats .stat:nth-child(3){display:none}.lang{padding:6px 10px}}
+/* tiers, songs, pagination */
+.tier{position:absolute;right:14px;top:18px;display:flex;gap:2px;align-items:flex-end}
+.tier i{display:block;width:4px;border-radius:2px;background:var(--line)}
+.tier i:nth-child(1){height:6px}.tier i:nth-child(2){height:9px}.tier i:nth-child(3){height:12px}
+.tier.t1 i:nth-child(1),.tier.t2 i:nth-child(-n+2),.tier.t3 i{background:var(--r)}
+.w .nt{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--surface2);color:var(--c-t);vertical-align:3px;margin-left:6px}
+.w .nt svg{width:12px;height:12px}
+.song{display:inline-flex;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:linear-gradient(135deg,color-mix(in srgb,var(--c-t) 14%,var(--surface)),var(--surface2));border:1px solid var(--line);font-size:13px;line-height:1.3;max-width:100%}
+.song svg{width:18px;height:18px;color:var(--c-t);flex:none}
+.song b{font-weight:700}
+.song small{display:block;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wcount{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin:0 0 10px;letter-spacing:.04em}
+.lvl{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--ink);color:var(--surface);font-weight:800;font-size:13px;white-space:nowrap}
+.lvl svg{width:26px;height:26px}
+.goal{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;padding:18px 22px;margin-bottom:14px}
+.goal svg{width:76px;height:76px}
+.goal b{font-family:var(--f-display);font-size:22px}
+.gbanner{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:22px 24px;margin-bottom:28px;text-decoration:none;color:var(--ink);position:relative;overflow:hidden}
+.gbanner h3{font-size:24px}
+.gbanner p{color:var(--muted)}
+.gbanner .stack{display:flex;gap:6px}
+.gbanner .stack .blk{transform:rotate(var(--rot));font-size:15px}
+
+/* GAMES */
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.garena{padding:24px;min-height:440px;display:flex;flex-direction:column;gap:18px}
+.gintro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;flex:1}
+.gintro .best{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.gtop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ring{position:relative;width:64px;height:64px}
+.ring svg{width:64px;height:64px;transform:rotate(-90deg)}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:20px;font-variant-numeric:tabular-nums}
+.score{display:flex;flex-direction:column;align-items:center}
+.score b{font-family:var(--f-display);font-weight:900;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.score span{font-size:12px;color:var(--muted)}
+.combo{font-family:var(--f-display);font-weight:900;font-size:26px;padding:6px 14px;border-radius:12px;background:var(--c-v);color:#fff;min-width:64px;text-align:center;transition:transform .2s}
+.combo.up{animation:bump .35s cubic-bezier(.3,1.7,.5,1)}
+.gword{font-family:var(--f-en);font-size:clamp(40px,7vw,64px);line-height:1;text-align:center;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap}
+.gword.pop{animation:pop .35s cubic-bezier(.3,1.7,.5,1)}
+.pairs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pc{perspective:800px;border:0;background:none;padding:0;display:block;width:100%;aspect-ratio:4/3;max-width:100%;min-height:72px}
+.pc-in{display:block;position:relative;width:100%;height:100%;transition:transform .45s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+.pc.on .pc-in,.pc.ok .pc-in{transform:rotateY(180deg)}
+.pc-f,.pc-b{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;padding:8px;text-align:center}
+.pc-f{background:var(--c-s);background-image:radial-gradient(rgba(255,255,255,.28) 3px,transparent 3.5px);background-size:18px 18px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
+.pc-b{transform:rotateY(180deg);background:var(--surface);border:2px solid var(--line);font-weight:700;font-size:14px;line-height:1.2;overflow-wrap:anywhere}
+.pc-b.en{font-family:var(--f-en);font-weight:400;font-size:20px}
+.pc.ok .pc-b{border-color:var(--ok);background:var(--okbg);color:var(--ok)}
+.pc.ok{animation:pop .4s cubic-bezier(.3,1.7,.5,1)}
+.trk{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;padding:26px 18px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--c-t) 18%,var(--surface2)),color-mix(in srgb,var(--c-x) 10%,var(--surface2)));border:1px solid var(--line)}
+.trk .tt{font-family:var(--f-display);font-weight:900;font-size:clamp(24px,4vw,36px);line-height:1.1}
+.trk .ar{color:var(--muted);font-weight:600}
+.trk .disc{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,var(--surface) 0 7px,var(--ink) 8px 12px,#2a2f45 13px 100%);box-shadow:0 6px 18px rgba(0,0,0,.25);animation:spinSlow 3s linear infinite}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+
+/* FX */
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(120px);z-index:60;background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;transition:transform .35s cubic-bezier(.3,1.5,.5,1);max-width:calc(100vw - 32px)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+.xpf{position:fixed;z-index:55;pointer-events:none;font-family:var(--f-display);font-weight:900;font-size:20px;color:var(--c-o);transform:translate(-50%,-50%);animation:xpf 1.1s ease-out forwards;text-shadow:0 2px 0 var(--surface)}
+
+@keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes drop{0%{opacity:0;transform:translateY(-70px) rotate(-8deg)}70%{opacity:1}100%{transform:none}}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+@keyframes popin{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@keyframes bump{50%{transform:scale(1.18)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes glow{50%{box-shadow:0 0 0 4px var(--r),var(--shadow)}}
+@keyframes xpf{0%{opacity:0;margin-top:0;scale:.6}20%{opacity:1;scale:1.15}100%{opacity:0;margin-top:-70px;scale:1}}
+
+@media (max-width:1320px){.nav a:not(.on) span{display:none}}
+@media (max-width:980px){
+  .talk{grid-template-columns:minmax(0,1fr)}
+  .scenes{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .scenes button{flex:none;width:220px}
+  .ladder{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .banners{grid-template-columns:minmax(0,1fr)}
+  .games{grid-template-columns:minmax(0,1fr)}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .path,.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .build{grid-template-columns:minmax(0,1fr)}
+  .lessons{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .lessons button{flex:none;width:220px}
+  .tdetail{grid-template-columns:minmax(0,1fr)}
+  .modes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .trainbox{grid-template-columns:minmax(0,1fr)}
+  .nav a span{display:none}
+}
+@media (max-width:720px){
+  .nav{display:none}
+  .stats .stat:nth-child(4){display:none}
+  .top-in{justify-content:space-between}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));padding-left:max(6px,env(safe-area-inset-left,0px));padding-right:max(6px,env(safe-area-inset-right,0px))}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:10px;text-decoration:none;color:var(--muted);font-size:10px;font-weight:600}
+  .tabbar a svg{width:22px;height:22px}
+  .tabbar a.on{color:var(--c-s)}
+  main{padding-bottom:110px}
+  .matrix{grid-template-columns:repeat(4,minmax(150px,1fr));overflow-x:auto;padding-bottom:6px}
+  .matrix .mrow{grid-column:1/-1;padding:8px 2px 0}
+  .matrix .corner{display:none}
+  .sci{grid-template-columns:minmax(0,1fr)}
+  .w.open{grid-column:auto}
+  .mopts{grid-template-columns:minmax(0,1fr)}
+  .wotd{grid-template-columns:minmax(0,1fr)}
+  .pairs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .phone{border-width:6px;border-radius:28px}
+  .msgs{max-height:55vh}
+  .gbanner{grid-template-columns:minmax(0,1fr)}
+  .tabbar a span{font-size:9px}
+  #toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:440px){
+  .stats .stat:nth-child(2){display:none}
+  .brand{font-size:16px}
+  .path,.kpis,.modes{grid-template-columns:minmax(0,1fr)}
+  .blk{font-size:15px;padding:8px 11px 9px}
+}
+@media (min-width:721px){.cwrap .phone{min-height:620px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<header class="top"><div class="top-in">
+  <a class="brand" href="#start" aria-label="Español Blocks — на старт">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="18" width="16" height="11" rx="3" fill="var(--c-s)"/><rect x="14" y="7" width="16" height="11" rx="3" fill="var(--c-v)"/><rect x="5" y="15" width="4" height="4" rx="1.5" fill="var(--c-s)"/><rect x="18" y="4" width="4" height="4" rx="1.5" fill="var(--c-v)"/><rect x="24" y="4" width="4" height="4" rx="1.5" fill="var(--c-v)"/></svg>
+    Español Blocks
+  </a>
+  <nav class="nav" id="nav" aria-label="Разделы"></nav>
+  <div class="stats" id="stats"></div><a class="lang" id="langsw" href="en.html" title="Сменить язык">EN</a>
+</div></header>
+<main id="view"></main>
+<nav class="tabbar" id="tabbar" aria-label="Разделы"></nav>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ═══════════ ICONS ═══════════ */
+const I = {
+  start: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/></svg>',
+  build: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="13" width="8" height="7" rx="1.5"/><rect x="13" y="13" width="8" height="7" rx="1.5"/><rect x="8" y="4" width="8" height="7" rx="1.5"/></svg>',
+  tenses: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18"/><circle cx="7" cy="12" r="2" fill="currentColor"/><path d="M12 7v10"/><path d="M16 9c1 1 2 2 4 3-2 1-3 2-4 3"/></svg>',
+  words: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 8h5"/></svg>',
+  train: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="13" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v12"/></svg>',
+  science: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/></svg>',
+  sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
+  bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="var(--c-v)"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="var(--c-p)"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="var(--c-o)"><path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-5a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h5z" opacity=".6"/></svg>',
+  undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>',
+  cards: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg>',
+  gap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4M17 12h4"/><rect x="8" y="8" width="8" height="8" rx="1.5" stroke-dasharray="2 2"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 4h12v8H8l-4 3z"/><path d="M18 9h3v7l-3-2h-6v-2"/></svg>',
+  talk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg>',
+  games: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1" fill="currentColor"/><circle cx="18" cy="13.5" r="1" fill="currentColor"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',
+  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+  swap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>'
+};
+
+/* ═══════════ STORE (per-viewer progress in this browser) ═══════════ */
+const KEY = 'espanol-blocks-v1';
+let store = { xp: 0, streak: 0, last: '', box: {}, done: {}, tq: {}, best: {}, day: { d: '', xp: 0 }, ui: { lesson: 0, tense: 'pres_simple', cat: 'all', mode: 'ru-en', tcat: 'all' } };
+try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw); store = Object.assign(store, d); store.best = store.best || {}; store.day = store.day || { d: '', xp: 0 };
+  store.ui = Object.assign({ lesson: 0, tense: 'pres_simple', cat: 'all', mode: 'ru-en', tcat: 'all' }, d.ui || {}); } } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+const dayStr = d => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+
+/* ═══════════ DATA: SENTENCE LESSONS ═══════════ */
+const ROLE = { s: 'Кто', v: 'Делает', o: 'Что', p: 'Где', t: 'Когда', x: 'Помощник', q: 'Вопрос', a: 'Уточнение', n: 'не' };
+const LESSONS = [{"t": "Скелет: кто + что делает", "s": "Подлежащее часто опускают", "body": "В испанском глагол сам показывает, кто действует: <b>Hablo</b> = «(я) говорю». Местоимения <b>yo, tú, él</b> ставят только для акцента. Для погоды и общих утверждений есть безличные формы: <b>Hace frío</b> (холодно), <b>Hay</b> (есть, имеется), <b>Es tarde</b> (поздно).", "f": [["Sujeto", "s", "кто, можно опустить"], ["+"], ["Verbo", "v", "делает"]], "ex": [["Trabajo.", "Я работаю."], ["Hace frío.", "Холодно."], ["Hay un gato en la cocina.", "На кухне кошка."], ["Es tarde.", "Поздно."]], "tip": "Hay значит «есть, имеется» и для одного, и для многих: Hay un libro. Hay dos libros.", "tasks": [{"ru": "Сегодня холодно.", "p": [["Hoy", "t"], ["hace", "v"], ["frío", "o"]]}, {"ru": "На кухне кошка.", "p": [["Hay", "v"], ["un gato", "o"], ["en la cocina", "p"]]}]}, {"t": "Порядок слов: S V O P T", "s": "Кто → делает → что → где → когда", "body": "Порядок в испанском свободнее, чем в английском, но базовый поезд такой же: <b>Кто → Делает → Что → Где → Когда</b>. Местоимения-дополнения встают <b>перед</b> глаголом: <i>Lo veo</i> («его вижу»). Перед людьми-дополнениями ставится <b>a</b>: <i>Veo a Ana</i>.", "f": [["S", "s", "кто"], ["V", "v", "делает"], ["O", "o", "что"], ["P", "p", "где"], ["T", "t", "когда"]], "ex": [["Yo bebo café en casa cada mañana.", "Я пью кофе дома каждое утро."], ["Ella juega al tenis en el parque los domingos.", "По воскресеньям она играет в теннис в парке."], ["Nosotros vimos a nuestros amigos en el café ayer.", "Вчера мы видели друзей в кафе."]], "tip": "Личное a: Veo a Ana, Llamo a mi madre. Перед предметами a не нужно: Veo la tele.", "tasks": [{"ru": "Я пью кофе дома каждое утро.", "p": [["Yo", "s"], ["bebo", "v"], ["café", "o"], ["en casa", "p"], ["cada mañana", "t"]]}, {"ru": "Вчера мы видели друзей в кафе.", "p": [["Ayer", "t"], ["nosotros", "s"], ["vimos", "v"], ["a nuestros amigos", "o"], ["en el café", "p"]]}, {"ru": "По воскресеньям она играет в теннис в парке.", "p": [["Ella", "s"], ["juega", "v"], ["al tenis", "o"], ["en el parque", "p"], ["los domingos", "t"]]}]}, {"t": "Существительное и прилагательное", "s": "Род, артикль и прилагательное после", "body": "У каждого существительного есть род: <b>el</b> (м.) или <b>la</b> (ж.), множественное число — <b>los / las</b>. Существительные на <b>-o</b> обычно мужские, на <b>-a</b> женские. Прилагательное стоит <b>после</b> существительного и согласуется с ним: <i>una casa grande</i>, <i>unos libros interesantes</i>.", "f": [["Artículo", "a", "el / la"], ["Sustantivo", "s", "casa"], ["Adjetivo", "o", "grande"]], "ex": [["la casa grande", "большой дом"], ["un libro interesante", "интересная книга"], ["unas chicas simpáticas", "милые девушки"], ["el café caliente", "горячий кофе"]], "tip": "Короткие прилагательные перед существительным теряют окончание: buen amigo, gran ciudad.", "tasks": [{"ru": "большой дом", "p": [["la casa", "s"], ["grande", "a"]]}, {"ru": "интересные книги", "p": [["los libros", "s"], ["interesantes", "a"]]}, {"ru": "красная машина", "p": [["un coche", "s"], ["rojo", "a"]]}]}, {"t": "Вопросы и отрицание", "s": "Без do/does, просто ¿ и no", "body": "Вспомогательных do/does нет. Вопрос строят те же слова с вопросительной интонацией, а на письме ставят <b>¿ … ?</b>. Вопросительные слова пишутся с ударением: <b>qué, quién, dónde, cuándo, cómo, por qué, cuánto</b>. Отрицание: <b>no</b> прямо перед глаголом, и двойное отрицание в испанском нормально: <i>No veo nada</i>.", "f": [["Q", "q", "dónde"], ["V", "v", "vives"], ["S", "s", "tú, можно опустить"], ["?"]], "ex": [["¿Dónde vives?", "Где ты живёшь?"], ["¿Qué quieres beber?", "Что ты хочешь выпить?"], ["No hablo inglés.", "Я не говорю по-испански."], ["No veo nada.", "Я ничего не вижу."]], "tip": "¿ ставится в начале вопроса, ¡ в начале восклицания. Это обязательная часть письма.", "tasks": [{"ru": "Где ты живёшь?", "p": [["¿Dónde", "q"], ["vives?", "v"]]}, {"ru": "Я не говорю по-испански.", "p": [["No", "n"], ["hablo", "v"], ["inglés", "o"]]}, {"ru": "Что ты хочешь пить?", "p": [["¿Qué", "q"], ["quieres", "v"], ["beber?", "o"]]}]}, {"t": "Ser и estar", "s": "Суть и состояние", "body": "Оба глагола значат «быть». <b>Ser</b>: кто или что ты есть (профессия, национальность, характер, время, происхождение). <b>Estar</b>: где ты находишься и в каком состоянии (самочувствие, настроение). Простое правило: <b>ser — суть, estar — состояние и место</b>.", "f": [["SER", "s", "суть"], ["ESTAR", "v", "состояние, место"]], "ex": [["Soy ingeniero.", "Я инженер."], ["Estoy cansado.", "Я устал."], ["La sopa está fría.", "Суп холодный (сейчас)."], ["Madrid está en España.", "Мадрид находится в Испании."]], "tip": "Одно слово, два смысла: ser aburrido — быть скучным, estar aburrido — скучать.", "tasks": [{"ru": "Я инженер.", "p": [["Soy", "v"], ["ingeniero", "o"]]}, {"ru": "Сегодня я устал.", "p": [["Hoy", "t"], ["estoy", "v"], ["cansado", "o"]]}, {"ru": "Мадрид находится в Испании.", "p": [["Madrid", "s"], ["está", "v"], ["en España", "p"]]}]}, {"t": "Gustar и друзья", "s": "Нравится, хочу, могу, собираюсь", "body": "<b>Gustar</b> работает «наоборот»: <i>Me gusta el café</i> = «кофе мне нравится». Если нравится несколько вещей, глагол во множественном числе: <i>Me gustan los perros</i>. Дальше всё просто: <b>querer / poder / tener que + инфинитив</b>, а будущее строят через <b>ir a + инфинитив</b>.", "f": [["Me", "x", "кому"], ["gusta", "v", "нравится"], ["el café", "s", "что"]], "ex": [["Me gusta el café.", "Мне нравится кофе."], ["Me gustan los perros.", "Мне нравятся собаки."], ["Quiero aprender español.", "Я хочу выучить испанский."], ["Voy a comer.", "Я собираюсь поесть."], ["Tengo que trabajar.", "Мне нужно работать."]], "tip": "Если после gustar стоит глагол, всегда gusta: Me gusta bailar.", "tasks": [{"ru": "Мне нравится кофе.", "p": [["Me", "x"], ["gusta", "v"], ["el café", "s"]]}, {"ru": "Мне нравятся собаки.", "p": [["Me", "x"], ["gustan", "v"], ["los perros", "s"]]}, {"ru": "Я собираюсь поесть.", "p": [["Voy", "v"], ["a comer", "o"]]}, {"ru": "Мне нужно работать.", "p": [["Tengo que", "v"], ["trabajar", "o"]]}]}];
+const AUX = [];
+/* ═══════════ DATA: TENSES (Spanish) ═══════════ */
+const T = [{"id": "pres", "n": "Presente", "ru": "Настоящее", "tl": "pres_simple", "mini": "hablo", "c": "var(--c-s)", "idea": "Факт, привычка, то, что происходит сейчас, и близкое будущее (Mañana trabajo).", "f": {"+": "hablo · hablas · habla", "−": "no hablo", "?": "¿Hablas?"}, "ex": [["Trabajo en Madrid.", "Я работаю в Мадриде."], ["Mañana salgo temprano.", "Завтра я выхожу рано."]], "sig": ["siempre", "normalmente", "todos los días", "ahora", "mañana (план)"], "tip": "Окончания -ar: -o, -as, -a, -amos, -áis, -an. Для -er и -ir почти то же, меняются гласные.", "q": [["Yo ___ en Madrid.", "vivo", "vives", "viven", "yo → -o."], ["Ella ___ mucho.", "trabaja", "trabajas", "trabajo", "ella → -a."], ["Nosotros ___ pizza.", "comemos", "comen", "como", "nosotros → -emos."]], "star": 1}, {"id": "cont", "n": "Estar + gerundio", "ru": "Процесс прямо сейчас", "tl": "pres_cont", "mini": "estoy hablando", "c": "var(--c-v)", "idea": "Что происходит прямо сейчас.", "f": {"+": "estoy / estás / está hablando", "−": "no estoy hablando", "?": "¿Estás hablando?"}, "ex": [["Estoy comiendo.", "Я ем (сейчас)."], ["¿Qué estás haciendo?", "Что ты сейчас делаешь?"]], "sig": ["ahora", "ahora mismo", "en este momento"], "tip": "Gerundio: -ando (hablar → hablando), -iendo (comer → comiendo, vivir → viviendo).", "q": [["Ahora ___ comiendo.", "estoy", "soy", "tengo", "Процесс сейчас: estar + gerundio."], ["¿Qué ___ haciendo?", "estás", "eres", "tienes", "Вопрос о процессе: estar."], ["Ella está ___.", "trabajando", "trabaja", "trabajar", "После estar идёт gerundio."]], "star": 1}, {"id": "ira", "n": "Ir a + infinitivo", "ru": "Собираюсь (план)", "tl": "going_to", "mini": "voy a hablar", "c": "var(--c-o)", "idea": "Ближайший план или намерение. Самое простое будущее.", "f": {"+": "voy a hablar", "−": "no voy a hablar", "?": "¿Vas a hablar?"}, "ex": [["Voy a comer.", "Я собираюсь поесть."], ["Mañana vamos a viajar.", "Завтра мы едем."]], "sig": ["mañana", "esta noche", "pronto"], "tip": "Формула: ir (в нужной форме) + a + инфинитив.", "q": [["Mañana ___ a viajar.", "voy", "estoy", "tengo", "Будущее: ir a + инфинитив."], ["¿___ a venir?", "Vas", "Eres", "Tienes", "vas a venir."], ["Vamos a ___.", "comer", "comemos", "comiendo", "После ir a идёт инфинитив."]], "star": 1}, {"id": "perf", "n": "Pretérito perfecto", "ru": "Уже произошло, связано с сейчас", "tl": "pres_perf", "mini": "he hablado", "c": "var(--c-p)", "idea": "Опыт и результат; то, что было сегодня, на этой неделе, в этом году.", "f": {"+": "he / has / ha hablado", "−": "no he hablado", "?": "¿Has hablado?"}, "ex": [["Ya he comido.", "Я уже поел."], ["¿Has estado en México?", "Ты бывал в Мексике?"]], "sig": ["ya", "todavía no", "hoy", "esta semana", "alguna vez"], "tip": "haber + причастие на -ado / -ido. Неправильные: hecho, dicho, visto, escrito, puesto.", "q": [["Hoy ___ trabajado mucho.", "he", "soy", "tengo", "Сегодня → perfecto: he + причастие."], ["¿___ estado en México?", "Has", "Eres", "Tienes", "has estado."], ["Ya hemos ___.", "comido", "comimos", "comer", "haber + -ido."]], "star": 1}, {"id": "ind", "n": "Pretérito indefinido", "ru": "Завершённое действие в прошлом", "tl": "past_simple", "mini": "hablé", "c": "var(--c-t)", "idea": "Событие закончилось: вчера, в 2020 году, на прошлой неделе.", "f": {"+": "hablé · hablaste · habló", "−": "no hablé", "?": "¿Hablaste?"}, "ex": [["Ayer fui al cine.", "Вчера я ходил в кино."], ["Comimos paella.", "Мы ели паэлью."]], "sig": ["ayer", "anoche", "la semana pasada", "en 2020", "hace dos años"], "tip": "Ser и ir в indefinido совпадают: fui, fuiste, fue, fuimos, fuisteis, fueron.", "q": [["Ayer ___ al cine.", "fui", "voy", "iba", "ayer → завершённое действие."], ["Anoche ___ pizza.", "comimos", "comemos", "comíamos", "anoche → indefinido."], ["La semana pasada ___ a Madrid.", "viajé", "viajo", "viajaba", "Завершённое действие."]], "star": 1}, {"id": "imp", "n": "Pretérito imperfecto", "ru": "Привычка и фон в прошлом", "tl": "past_cont", "mini": "hablaba", "c": "var(--c-x)", "idea": "Как было раньше, что длилось, описание. Cuando era niño, vivía en Moscú.", "f": {"+": "hablaba · hablabas · hablaba", "−": "no hablaba", "?": "¿Hablabas?"}, "ex": [["Cuando era niño, jugaba mucho.", "Когда я был ребёнком, я много играл."], ["Hacía sol y todos estaban contentos.", "Было солнечно, и все были довольны."]], "sig": ["antes", "cuando era niño", "todos los días", "mientras"], "tip": "Всего три неправильных глагола: ser (era), ir (iba), ver (veía).", "q": [["Antes ___ en Rusia.", "vivía", "viví", "vivo", "Раньше, привычка → imperfecto."], ["De niño ___ mucho.", "jugaba", "jugué", "juego", "Привычка в детстве."], ["Mientras comía, ___ la tele.", "veía", "vi", "veo", "Фон: imperfecto."]], "star": 0}, {"id": "fut", "n": "Futuro simple", "ru": "Будущее, прогноз", "tl": "fut_simple", "mini": "hablaré", "c": "var(--c-q)", "idea": "Обещание, прогноз, предположение.", "f": {"+": "hablaré · hablarás · hablará", "−": "no hablaré", "?": "¿Hablarás?"}, "ex": [["Mañana lloverá.", "Завтра будет дождь."], ["Te llamaré luego.", "Я позвоню тебе позже."]], "sig": ["mañana", "pronto", "algún día", "el año que viene"], "tip": "К инфинитиву добавляют -é, -ás, -á, -emos, -éis, -án. Неправильные основы: tendr-, har-, podr-, dir-.", "q": [["Mañana ___ sol.", "habrá", "hay", "había", "Прогноз: futuro."], ["Te ___ luego.", "llamaré", "llamo", "llamé", "Обещание: futuro."], ["El año que viene ___ en Madrid.", "viviré", "vivo", "viví", "Будущее."]], "star": 0}, {"id": "cond", "n": "Condicional", "ru": "Вежливо, «бы»", "tl": "fut_simple", "mini": "hablaría", "c": "var(--c-l)", "idea": "Вежливая просьба, совет, гипотеза: Me gustaría un café.", "f": {"+": "hablaría · hablarías", "−": "no hablaría", "?": "¿Hablarías?"}, "ex": [["Me gustaría un café.", "Я бы хотел кофе."], ["¿Podrías ayudarme?", "Ты не мог бы мне помочь?"]], "sig": ["me gustaría", "podría", "sería", "yo en tu lugar"], "tip": "Основа как в futuro + окончания imperfecto: -ía, -ías, -ía, -íamos, -íais, -ían.", "q": [["___ un café, por favor.", "Querría", "Quiero", "Quise", "Вежливо: condicional."], ["¿___ ayudarme?", "Podrías", "Puedes", "Pudiste", "Мягкая просьба."], ["Yo en tu lugar ___ más.", "estudiaría", "estudio", "estudié", "Совет: condicional."]], "star": 0}, {"id": "imp2", "n": "Imperativo", "ru": "Команда, просьба", "tl": "pres_simple", "mini": "habla", "c": "var(--c-k)", "idea": "Приказ или просьба: ¡Ven aquí!", "f": {"+": "habla (tú) · hable (usted)", "−": "no hables", "?": "—"}, "ex": [["¡Ven aquí!", "Иди сюда!"], ["Dime la verdad.", "Скажи мне правду."]], "sig": ["por favor", "venga", "oye"], "tip": "Утвердительная команда для tú совпадает с формой «он/она»: habla, come, vive. Отрицательная меняется: no hables.", "q": [["¡___ aquí!", "Ven", "Vienes", "Venir", "Команда для tú: ven."], ["___ la puerta, por favor.", "Cierra", "Cierras", "Cerrar", "Просьба: cierra."], ["No ___ tarde.", "llegues", "llegas", "llega", "Отрицательная команда: llegues."]], "star": 0}];
+const TBY = Object.fromEntries(T.map(t => [t.id, t]));
+const COLOF = t => t.c;
+const PRON = ['yo', 'tú', 'él / ella / usted', 'nosotros', 'vosotros', 'ellos / ustedes'];
+const VERBS = { hablar: 'говорить', comer: 'есть', vivir: 'жить', ser: 'быть (суть)', estar: 'быть (состояние)', ir: 'идти', tener: 'иметь', hacer: 'делать' };
+const IRRP = { ser: ['soy', 'eres', 'es', 'somos', 'sois', 'son'], estar: ['estoy', 'estás', 'está', 'estamos', 'estáis', 'están'], ir: ['voy', 'vas', 'va', 'vamos', 'vais', 'van'], tener: ['tengo', 'tienes', 'tiene', 'tenemos', 'tenéis', 'tienen'], hacer: ['hago', 'haces', 'hace', 'hacemos', 'hacéis', 'hacen'] };
+const IRRI = { ser: ['fui', 'fuiste', 'fue', 'fuimos', 'fuisteis', 'fueron'], ir: ['fui', 'fuiste', 'fue', 'fuimos', 'fuisteis', 'fueron'], estar: ['estuve', 'estuviste', 'estuvo', 'estuvimos', 'estuvisteis', 'estuvieron'], tener: ['tuve', 'tuviste', 'tuvo', 'tuvimos', 'tuvisteis', 'tuvieron'], hacer: ['hice', 'hiciste', 'hizo', 'hicimos', 'hicisteis', 'hicieron'] };
+const IRRM = { ser: ['era', 'eras', 'era', 'éramos', 'erais', 'eran'], ir: ['iba', 'ibas', 'iba', 'íbamos', 'ibais', 'iban'] };
+const IRRIMP = { ser: ['—', 'sé', 'sea', 'seamos', 'sed', 'sean'], estar: ['—', 'está', 'esté', 'estemos', 'estad', 'estén'], ir: ['—', 've', 'vaya', 'vayamos', 'id', 'vayan'], tener: ['—', 'ten', 'tenga', 'tengamos', 'tened', 'tengan'], hacer: ['—', 'haz', 'haga', 'hagamos', 'haced', 'hagan'] };
+const STEM = { tener: 'tendr', hacer: 'har' };
+const PART = { hablar: 'hablado', comer: 'comido', vivir: 'vivido', ser: 'sido', estar: 'estado', ir: 'ido', tener: 'tenido', hacer: 'hecho' };
+const GER = { hablar: 'hablando', comer: 'comiendo', vivir: 'viviendo', ser: 'siendo', estar: 'estando', ir: 'yendo', tener: 'teniendo', hacer: 'haciendo' };
+const END = { pres: { ar: ['o', 'as', 'a', 'amos', 'áis', 'an'], er: ['o', 'es', 'e', 'emos', 'éis', 'en'], ir: ['o', 'es', 'e', 'imos', 'ís', 'en'] }, ind: { ar: ['é', 'aste', 'ó', 'amos', 'asteis', 'aron'], er: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'] }, imp: { ar: ['aba', 'abas', 'aba', 'ábamos', 'abais', 'aban'], er: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'] }, fut: ['é', 'ás', 'á', 'emos', 'éis', 'án'], cond: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'] };
+function conj(v, tid) {
+  const kind = v.slice(-2), stem = v.slice(0, -2), K = kind === 'ar' ? 'ar' : 'er', reg = tbl => tbl.map(e => stem + e);
+  if (tid === 'pres') return IRRP[v] || reg(END.pres[kind]);
+  if (tid === 'ind') return IRRI[v] || reg(END.ind[K]);
+  if (tid === 'imp') return IRRM[v] || reg(END.imp[K]);
+  if (tid === 'fut') return END.fut.map(e => (STEM[v] || v) + e);
+  if (tid === 'cond') return END.cond.map(e => (STEM[v] || v) + e);
+  if (tid === 'cont') return IRRP.estar.map(f => f + ' ' + GER[v]);
+  if (tid === 'ira') return IRRP.ir.map(f => f + ' a ' + v);
+  if (tid === 'perf') return ['he', 'has', 'ha', 'hemos', 'habéis', 'han'].map(f => f + ' ' + PART[v]);
+  if (tid === 'imp2') return IRRIMP[v] || (kind === 'ar' ? ['—', stem + 'a', stem + 'e', stem + 'emos', stem + 'ad', stem + 'en'] : kind === 'er' ? ['—', stem + 'e', stem + 'a', stem + 'amos', stem + 'ed', stem + 'an'] : ['—', stem + 'e', stem + 'a', stem + 'amos', stem + 'id', stem + 'an']);
+  return [];
+}
+/* ═══════════ DATA: WORDS (Spanish, самая база) ═══════════ */
+const CATS = [
+  { id: 'verbs', n: 'Глаголы', r: 'var(--c-v)' },
+  { id: 'nouns', n: 'Существительные', r: 'var(--c-o)' },
+  { id: 'adj', n: 'Прилагательные', r: 'var(--c-p)' },
+  { id: 'linkers', n: 'Связки и вопросы', r: 'var(--c-q)' },
+  { id: 'phrases', n: 'Фразы', r: 'var(--c-a)' },
+  { id: 'life', n: 'Быт и город', r: 'var(--c-l)' },
+  { id: 'world', n: 'Числа, дни, цвета', r: 'var(--c-m)' },
+  { id: 'slang', n: 'Разговорка и сленг', r: 'var(--c-k)' },
+  { id: 'swear', n: 'Маты 18+', r: 'var(--bad)' }
+];
+const TIERS = { 1: 'База', 2: 'Уверенно', 3: 'Продвинуто' };
+const SW_T = { 1: 'Мягко', 2: 'Средне', 3: 'Жёстко' };
+const tierName = w => w.cat === 'swear' ? SW_T[w.t] : TIERS[w.t];
+const RAW = {"verbs": "1|ser|быть (постоянное)|Soy de Moscú.|Я из Москвы.\n1|estar|быть, находиться (состояние)|Estoy cansado hoy.|Я сегодня устал.\n1|tener|иметь|Tengo dos hermanos.|У меня два брата.\n1|hacer|делать|¿Qué haces ahora?|Что ты сейчас делаешь?\n1|ir|идти, ехать|Voy al trabajo en metro.|Я еду на работу на метро.\n1|venir|приходить, приезжать|¿Vienes a la fiesta?|Ты придёшь на вечеринку?\n1|poder|мочь|¿Puedo pasar?|Можно войти?\n1|querer|хотеть; любить|Quiero un café, por favor.|Мне кофе, пожалуйста.\n1|saber|знать, уметь|No sé la respuesta.|Я не знаю ответа.\n1|conocer|знать (человека, место)|Conozco a tu hermana.|Я знаком с твоей сестрой.\n1|decir|говорить, сказать|¿Qué dices?|Что ты говоришь?\n1|dar|давать|Dame un minuto.|Дай мне минуту.\n1|ver|видеть|¿Ves aquel edificio?|Ты видишь то здание?\n1|mirar|смотреть|Mira, es muy bonito.|Смотри, как красиво.\n1|oír|слышать|No te oigo bien.|Я тебя плохо слышу.\n1|escuchar|слушать|Me gusta escuchar música.|Я люблю слушать музыку.\n1|hablar|говорить|Hablo un poco de español.|Я немного говорю по-испански.\n1|llamar|звать; звонить|Te llamo luego.|Я тебе позже позвоню.\n1|llamarse|называться, зваться|Me llamo Ana.|Меня зовут Ана.\n1|vivir|жить|Vivo en Madrid.|Я живу в Мадриде.\n1|comer|есть|¿Qué quieres comer?|Что ты хочешь поесть?\n1|beber|пить|Bebo mucha agua.|Я пью много воды.\n1|trabajar|работать|Trabajo en una oficina.|Я работаю в офисе.\n1|estudiar|учиться, изучать|Estudio español todos los días.|Я учу испанский каждый день.\n1|aprender|учить, учиться|Quiero aprender más.|Я хочу узнать больше.\n1|entender|понимать|No entiendo nada.|Я ничего не понимаю.\n1|necesitar|нуждаться|Necesito ayuda.|Мне нужна помощь.\n1|gustar|нравиться|Me gusta esta canción.|Мне нравится эта песня.\n1|pensar|думать|Pienso que tienes razón.|Думаю, ты прав.\n1|creer|верить, считать|Creo que sí.|Думаю, да.\n1|sentir|чувствовать|Lo siento mucho.|Мне очень жаль.\n1|esperar|ждать; надеяться|Espero el autobús.|Я жду автобус.\n1|buscar|искать|Busco mis llaves.|Я ищу свои ключи.\n1|encontrar|находить|No encuentro mi móvil.|Не могу найти телефон.\n1|perder|терять; проигрывать|Perdí mi cartera.|Я потерял кошелёк.\n1|usar|использовать|¿Puedo usar tu cargador?|Можно воспользоваться твоей зарядкой?\n1|llevar|нести; носить|Llevo una chaqueta azul.|На мне синяя куртка.\n1|traer|приносить|¿Me traes agua?|Принесёшь мне воды?\n1|poner|класть, ставить|Pon la mesa, por favor.|Накрой на стол, пожалуйста.\n1|dejar|оставлять; разрешать|Déjame en paz.|Оставь меня в покое.\n1|salir|выходить|Salgo a las ocho.|Я выхожу в восемь.\n1|entrar|входить|Entra, está abierto.|Заходи, открыто.\n1|volver|возвращаться|Vuelvo a casa tarde.|Я возвращаюсь домой поздно.\n1|empezar|начинать|La clase empieza a las nueve.|Урок начинается в девять.\n1|terminar|заканчивать|Termino a las seis.|Я заканчиваю в шесть.\n1|pedir|просить, заказывать|Pido una cerveza.|Я заказываю пиво.\n1|preguntar|спрашивать|¿Puedo preguntar algo?|Можно кое-что спросить?\n1|responder|отвечать|Responde, por favor.|Ответь, пожалуйста.\n1|comprar|покупать|Compro pan cada día.|Я покупаю хлеб каждый день.\n1|pagar|платить|¿Puedo pagar con tarjeta?|Можно заплатить картой?\n1|cocinar|готовить|Me encanta cocinar.|Обожаю готовить.\n1|dormir|спать|Duermo ocho horas.|Я сплю восемь часов.\n1|despertarse|просыпаться|Me despierto a las siete.|Я просыпаюсь в семь.\n1|levantarse|вставать|Me levanto temprano.|Я рано встаю.\n1|ayudar|помогать|¿Me puedes ayudar?|Ты можешь мне помочь?\n1|abrir|открывать|Abre la ventana.|Открой окно.\n1|cerrar|закрывать|Cierra la puerta.|Закрой дверь.\n1|escribir|писать|Te escribo mañana.|Я напишу тебе завтра.\n1|leer|читать|Leo antes de dormir.|Я читаю перед сном.\n1|jugar|играть|Jugamos al fútbol.|Мы играем в футбол.\n1|viajar|путешествовать|Me gusta viajar solo.|Мне нравится путешествовать одному.\n1|recordar|помнить, вспоминать|No recuerdo su nombre.|Я не помню его имя.\n1|olvidar|забывать|No olvides las llaves.|Не забудь ключи.\n1|parecer|казаться|Parece fácil.|Кажется, это легко.\n1|importar|иметь значение|No importa.|Неважно.\n1|mandar|отправлять|Mándame un mensaje.|Отправь мне сообщение.\n1|quedar|встречаться; оставаться|Quedamos a las ocho.|Давай встретимся в восемь.\n1|seguir|продолжать; следовать|Sigue recto.|Иди прямо.\n1|conducir|водить|No sé conducir.|Я не умею водить.\n1|caminar|ходить пешком|Camino al trabajo.|Я хожу на работу пешком.\n1|correr|бегать|Corro por la mañana.|Я бегаю по утрам.\n1|bailar|танцевать|¿Bailamos?|Потанцуем?\n1|cantar|петь|Canta muy bien.|Она очень хорошо поёт.\n1|reír|смеяться|Nos reímos mucho.|Мы много смеялись.\n1|llorar|плакать|No llores.|Не плачь.\n1|llegar|прибывать|Llego en diez minutos.|Я приеду через десять минут.\n1|pasar|происходить; проходить|¿Qué pasa?|Что случилось?\n1|deber|быть должным|Debes descansar.|Тебе нужно отдохнуть.\n1|vender|продавать|Venden fruta fresca.|Здесь продают свежие фрукты.\n1|vivir|жить|¿Dónde vives?|Где ты живёшь?\n1|ganar|выигрывать; зарабатывать|Ganamos el partido.|Мы выиграли матч.\n1|cambiar|менять|Quiero cambiar de trabajo.|Я хочу сменить работу.\n1|cuidar|заботиться|Cuídate mucho.|Береги себя.\n1|invitar|приглашать|Te invito a cenar.|Приглашаю тебя на ужин.", "nouns": "1|el agua|вода|Quiero un vaso de agua.|Я хочу стакан воды.\n1|la casa|дом|Mi casa es tu casa.|Мой дом — твой дом.\n1|el café|кофе|Un café con leche, por favor.|Кофе с молоком, пожалуйста.\n1|la comida|еда|La comida está riquísima.|Еда очень вкусная.\n1|el pan|хлеб|Compro pan fresco.|Я покупаю свежий хлеб.\n1|la leche|молоко|Necesito leche.|Мне нужно молоко.\n1|el vino|вино|Una copa de vino tinto.|Бокал красного вина.\n1|la cerveza|пиво|Dos cervezas, por favor.|Два пива, пожалуйста.\n1|el trabajo|работа|Mi trabajo es interesante.|Моя работа интересная.\n1|el dinero|деньги|No tengo dinero.|У меня нет денег.\n1|el tiempo|время; погода|No tengo tiempo.|У меня нет времени.\n1|el día|день|¡Buen día!|Хорошего дня!\n1|la noche|ночь, вечер|Buenas noches.|Спокойной ночи.\n1|la mañana|утро|Por la mañana corro.|По утрам я бегаю.\n1|la tarde|вторая половина дня|Nos vemos por la tarde.|Увидимся днём.\n1|la semana|неделя|Trabajo toda la semana.|Я работаю всю неделю.\n1|el año|год|Tengo veinte años.|Мне двадцать лет.\n1|la vida|жизнь|La vida es bella.|Жизнь прекрасна.\n1|la gente|люди|La gente aquí es amable.|Люди здесь дружелюбные.\n1|el amigo|друг|Es mi mejor amigo.|Он мой лучший друг.\n1|la amiga|подруга|Mi amiga vive en Roma.|Моя подруга живёт в Риме.\n1|la familia|семья|Mi familia es grande.|У меня большая семья.\n1|la madre|мама|Mi madre cocina muy bien.|Моя мама очень хорошо готовит.\n1|el padre|отец|Mi padre trabaja mucho.|Мой отец много работает.\n1|el hermano|брат|Mi hermano tiene diez años.|Моему брату десять лет.\n1|la hermana|сестра|Mi hermana estudia medicina.|Моя сестра учится на врача.\n1|el hijo|сын|Tengo un hijo.|У меня есть сын.\n1|la hija|дочь|Su hija es muy simpática.|Его дочь очень милая.\n1|el niño|мальчик, ребёнок|El niño juega en el parque.|Мальчик играет в парке.\n1|la niña|девочка|La niña canta.|Девочка поёт.\n1|el hombre|мужчина|El hombre lee un libro.|Мужчина читает книгу.\n1|la mujer|женщина; жена|La mujer espera el tren.|Женщина ждёт поезд.\n1|el nombre|имя|¿Cuál es tu nombre?|Как тебя зовут?\n1|la ciudad|город|Madrid es una ciudad grande.|Мадрид — большой город.\n1|el país|страна|¿De qué país eres?|Из какой ты страны?\n1|la calle|улица|Vivo en esta calle.|Я живу на этой улице.\n1|el coche|машина|Mi coche es viejo.|Моя машина старая.\n1|el tren|поезд|El tren sale a las diez.|Поезд отправляется в десять.\n1|el avión|самолёт|El avión llega tarde.|Самолёт опаздывает.\n1|el libro|книга|Este libro es genial.|Эта книга классная.\n1|la escuela|школа|Mi hija va a la escuela.|Моя дочь ходит в школу.\n1|el teléfono|телефон|¿Dónde está mi teléfono?|Где мой телефон?\n1|la cosa|вещь, дело|¡Qué cosa más rara!|Какая странная штука!\n1|la vez|раз|Una vez por semana.|Раз в неделю.\n1|el problema|проблема|No hay problema.|Нет проблем.\n1|la pregunta|вопрос|Tengo una pregunta.|У меня есть вопрос.\n1|la respuesta|ответ|No sé la respuesta.|Я не знаю ответа.\n1|la fiesta|вечеринка, праздник|La fiesta es el sábado.|Вечеринка в субботу.\n1|el viaje|поездка|¡Buen viaje!|Хорошей поездки!\n1|la playa|пляж|Vamos a la playa.|Мы идём на пляж.\n1|el mar|море|Me encanta el mar.|Я обожаю море.\n1|el sol|солнце|Hoy hay mucho sol.|Сегодня очень солнечно.\n1|la lluvia|дождь|Odio la lluvia.|Терпеть не могу дождь.\n1|la mesa|стол|La mesa está libre.|Столик свободен.\n1|la puerta|дверь|Cierra la puerta.|Закрой дверь.\n1|la ventana|окно|Abre la ventana.|Открой окно.\n1|la habitación|комната|Mi habitación es pequeña.|Моя комната маленькая.\n1|el baño|ванная, туалет|¿Dónde está el baño?|Где туалет?\n1|la cocina|кухня|La cocina está limpia.|Кухня чистая.\n1|el ordenador|компьютер|Mi ordenador es nuevo.|Мой компьютер новый.\n1|la cuenta|счёт|La cuenta, por favor.|Счёт, пожалуйста.\n1|el restaurante|ресторан|Reservé en un restaurante.|Я забронировал столик в ресторане.\n1|la tienda|магазин|La tienda cierra a las ocho.|Магазин закрывается в восемь.\n1|el médico|врач|Voy al médico.|Я иду к врачу.\n1|la mano|рука (кисть)|Dame la mano.|Дай мне руку.\n1|la cabeza|голова|Me duele la cabeza.|У меня болит голова.\n1|el corazón|сердце|Tiene buen corazón.|У него доброе сердце.\n1|los ojos|глаза|Tiene los ojos verdes.|У неё зелёные глаза.\n1|la ropa|одежда|Compro ropa nueva.|Я покупаю новую одежду.\n1|las llaves|ключи|¿Dónde están mis llaves?|Где мои ключи?\n1|la bolsa|сумка, пакет|Lleva una bolsa grande.|У неё большая сумка.\n1|el dolor|боль|Tengo dolor de espalda.|У меня болит спина.\n1|la música|музыка|Me encanta la música latina.|Обожаю латиноамериканскую музыку.\n1|la película|фильм|¿Vemos una película?|Посмотрим фильм?\n1|el perro|собака|Mi perro se llama Max.|Мою собаку зовут Макс.\n1|el gato|кот|El gato duerme.|Кот спит.\n1|la verdad|правда|Dime la verdad.|Скажи правду.\n1|la idea|идея|Es una buena idea.|Это хорошая идея.\n1|el amor|любовь|El amor no tiene edad.|У любви нет возраста.\n1|el miedo|страх|Tengo miedo.|Мне страшно.\n1|la ayuda|помощь|Necesito ayuda.|Мне нужна помощь.\n1|el momento|момент|Un momento, por favor.|Один момент, пожалуйста.\n1|el lugar|место|Es un lugar tranquilo.|Это тихое место.\n1|el mundo|мир|Quiero viajar por el mundo.|Я хочу путешествовать по миру.\n1|la razón|причина; правота|Tienes razón.|Ты прав.", "adj": "1|bueno|хороший|Es muy buena persona.|Он очень хороший человек.\n1|malo|плохой|Hace mal tiempo.|Погода плохая.\n1|grande|большой|Tiene una casa grande.|У него большой дом.\n1|pequeño|маленький|Es un pueblo pequeño.|Это маленький город.\n1|nuevo|новый|Tengo un móvil nuevo.|У меня новый телефон.\n1|viejo|старый|Es un coche viejo.|Это старая машина.\n1|joven|молодой|Es muy joven.|Он очень молодой.\n1|bonito|красивый|¡Qué bonito!|Как красиво!\n1|feo|некрасивый|El edificio es feo.|Здание некрасивое.\n1|caro|дорогой|Es demasiado caro.|Это слишком дорого.\n1|barato|дешёвый|Es muy barato.|Это очень дёшево.\n1|fácil|лёгкий|El examen fue fácil.|Экзамен был лёгким.\n1|difícil|трудный|Es difícil de entender.|Это трудно понять.\n1|rápido|быстрый|Conduce muy rápido.|Он водит очень быстро.\n1|lento|медленный|El internet es lento.|Интернет медленный.\n1|cansado|уставший|Estoy muy cansado.|Я очень устал.\n1|contento|довольный|Estoy contento.|Я доволен.\n1|triste|грустный|¿Por qué estás triste?|Почему ты грустишь?\n1|enfadado|злой, сердитый|Está enfadado conmigo.|Он на меня сердится.\n1|simpático|приятный, милый|Tu hermano es muy simpático.|Твой брат очень приятный.\n1|inteligente|умный|Eres muy inteligente.|Ты очень умный.\n1|divertido|весёлый, забавный|La película fue divertida.|Фильм был весёлым.\n1|aburrido|скучный|La clase es aburrida.|Урок скучный.\n1|importante|важный|Es muy importante.|Это очень важно.\n1|necesario|необходимый|Es necesario descansar.|Необходимо отдохнуть.\n1|posible|возможный|¿Es posible?|Это возможно?\n1|imposible|невозможный|Es imposible.|Это невозможно.\n1|listo|готовый; сообразительный|¿Estás listo?|Ты готов?\n1|ocupado|занятый|Estoy ocupado ahora.|Я сейчас занят.\n1|libre|свободный|¿Estás libre mañana?|Ты свободен завтра?\n1|frío|холодный|La sopa está fría.|Суп холодный.\n1|caliente|горячий|El café está caliente.|Кофе горячий.\n1|rico|вкусный; богатый|La paella está rica.|Паэлья вкусная.\n1|mismo|тот же самый|Tenemos el mismo problema.|У нас та же проблема.\n1|otro|другой|Quiero otro café.|Хочу ещё кофе.\n1|mucho|много|Hay mucha gente.|Тут много людей.\n1|poco|мало|Tengo poco tiempo.|У меня мало времени.\n1|todo|весь, всё|Todo está bien.|Всё хорошо.\n1|cada|каждый|Cada día estudio.|Каждый день я учусь.\n1|primero|первый|Es la primera vez.|Это первый раз.\n1|último|последний|Es el último tren.|Это последний поезд.\n1|próximo|следующий|El próximo año viajo.|В следующем году я поеду.\n1|cierto|верный; определённый|Es cierto.|Это правда.\n1|seguro|уверенный; безопасный|¿Estás seguro?|Ты уверен?\n1|solo|один; только|Vivo solo.|Я живу один.\n1|enfermo|больной|Estoy enfermo.|Я болен.\n1|casado|женатый, замужняя|Está casada.|Она замужем.\n1|lleno|полный|El tren está lleno.|Поезд переполнен.\n1|abierto|открытый|La tienda está abierta.|Магазин открыт.\n1|cerrado|закрытый|El banco está cerrado.|Банк закрыт.\n1|limpio|чистый|La habitación está limpia.|Комната чистая.\n1|sucio|грязный|El suelo está sucio.|Пол грязный.", "linkers": "1|y|и|Café y pan, por favor.|Кофе и хлеб, пожалуйста.\n1|o|или|¿Café o té?|Кофе или чай?\n1|pero|но|Quiero ir, pero no puedo.|Я хочу пойти, но не могу.\n1|porque|потому что|Estoy cansado porque trabajé mucho.|Я устал, потому что много работал.\n1|si|если|Si quieres, vamos.|Если хочешь, пойдём.\n1|cuando|когда|Cuando llegues, llámame.|Когда приедешь, позвони мне.\n1|que|что; чем|Creo que tienes razón.|Думаю, ты прав.\n1|como|как; так как|Como llueve, no salgo.|Раз идёт дождь, я не выхожу.\n1|donde|где|Vivo donde nací.|Я живу там, где родился.\n1|qué|что? какой?|¿Qué quieres?|Чего ты хочешь?\n1|quién|кто?|¿Quién es?|Кто это?\n1|cómo|как?|¿Cómo estás?|Как дела?\n1|dónde|где?|¿Dónde vives?|Где ты живёшь?\n1|cuándo|когда?|¿Cuándo llegas?|Когда ты приезжаешь?\n1|cuánto|сколько?|¿Cuánto cuesta?|Сколько стоит?\n1|por qué|почему?|¿Por qué lloras?|Почему ты плачешь?\n1|cuál|какой? который?|¿Cuál prefieres?|Какой ты предпочитаешь?\n1|también|тоже|Yo también.|Я тоже.\n1|tampoco|тоже не|Yo tampoco.|Я тоже нет.\n1|ya|уже|Ya llegué.|Я уже приехал.\n1|todavía|ещё, всё ещё|Todavía no he comido.|Я ещё не ел.\n1|siempre|всегда|Siempre llego tarde.|Я всегда опаздываю.\n1|nunca|никогда|Nunca como carne.|Я никогда не ем мясо.\n1|a veces|иногда|A veces voy en bici.|Иногда я езжу на велосипеде.\n1|ahora|сейчас|Ahora no puedo.|Сейчас не могу.\n1|hoy|сегодня|Hoy hace calor.|Сегодня жарко.\n1|mañana|завтра|Mañana trabajo.|Завтра я работаю.\n1|ayer|вчера|Ayer fui al cine.|Вчера я ходил в кино.\n1|luego|потом|Hasta luego.|До скорого.\n1|después|после, потом|Después comemos.|Потом поедим.\n1|antes|раньше, до|Antes vivía en Rusia.|Раньше я жил в России.\n1|entonces|тогда, значит|Entonces, ¿vamos?|Ну что, пойдём?\n1|aquí|здесь|Estoy aquí.|Я здесь.\n1|allí|там|Allí hay un bar.|Там есть бар.\n1|muy|очень|Es muy bonito.|Это очень красиво.\n1|más|больше, ещё|Quiero más agua.|Хочу ещё воды.\n1|menos|меньше|Come menos azúcar.|Ешь меньше сахара.\n1|bien|хорошо|Estoy bien.|Я в порядке.\n1|mal|плохо|Me siento mal.|Мне плохо.\n1|mejor|лучше|Es mejor esperar.|Лучше подождать.\n1|casi|почти|Casi llegamos.|Мы почти приехали.\n1|solo|только|Solo quiero dormir.|Я хочу только спать.\n1|quizás|может быть|Quizás venga mañana.|Может быть, он придёт завтра.\n1|tal vez|возможно|Tal vez tengas razón.|Возможно, ты прав.\n1|claro|конечно|Claro que sí.|Конечно, да.\n1|con|с|Voy con mis amigos.|Я иду с друзьями.\n1|sin|без|Café sin azúcar.|Кофе без сахара.\n1|en|в, на|Estoy en casa.|Я дома.\n1|de|из, от, о|Soy de Rusia.|Я из России.\n1|a|к, в (направление)|Voy a la playa.|Я иду на пляж.\n1|para|для, чтобы|Es para ti.|Это для тебя.\n1|por|за, из-за, через|Gracias por todo.|Спасибо за всё.\n1|hasta|до|Hasta mañana.|До завтра.\n1|desde|с, начиная с|Vivo aquí desde 2020.|Я живу здесь с 2020 года.\n1|entre|между|Entre tú y yo.|Между нами.\n1|sobre|о, над|Hablamos sobre el viaje.|Мы говорим о поездке.\n1|aunque|хотя|Aunque llueva, salgo.|Даже если пойдёт дождь, я выйду.\n1|mientras|пока|Leo mientras como.|Я читаю, пока ем.\n1|además|кроме того|Además, es barato.|Кроме того, это дёшево.\n1|sin embargo|однако|Es caro; sin embargo, vale la pena.|Дорого, но оно того стоит.\n1|por eso|поэтому|Estoy cansado, por eso me voy.|Я устал, поэтому ухожу.", "phrases": "1|Hola|Привет|¡Hola! ¿Qué tal?|Привет! Как дела?\n1|Buenos días|Доброе утро|Buenos días, ¿cómo está?|Доброе утро, как вы?\n1|Buenas tardes|Добрый день|Buenas tardes, señor.|Добрый день, господин.\n1|Buenas noches|Добрый вечер; спокойной ночи|Buenas noches, hasta mañana.|Спокойной ночи, до завтра.\n1|¿Cómo estás?|Как дела?|¿Cómo estás hoy?|Как ты сегодня?\n1|¿Qué tal?|Как оно?|Hola, ¿qué tal?|Привет, как оно?\n1|Estoy bien, gracias|У меня всё хорошо, спасибо|Estoy bien, gracias, ¿y tú?|У меня всё хорошо, спасибо, а у тебя?\n1|Mucho gusto|Очень приятно|Mucho gusto en conocerte.|Очень приятно познакомиться.\n1|Por favor|Пожалуйста (просьба)|Un café, por favor.|Кофе, пожалуйста.\n1|Gracias|Спасибо|Muchas gracias.|Большое спасибо.\n1|De nada|Пожалуйста (в ответ)|\"Gracias.\" \"De nada.\"|— Спасибо. — Не за что.\n1|Perdón|Простите|Perdón, ¿dónde está el baño?|Простите, где туалет?\n1|Lo siento|Мне жаль|Lo siento mucho.|Мне очень жаль.\n1|Con permiso|Разрешите, позвольте пройти|Con permiso, voy a pasar.|Разрешите, я пройду.\n1|¿Cuánto cuesta?|Сколько стоит?|¿Cuánto cuesta esto?|Сколько это стоит?\n1|La cuenta, por favor|Счёт, пожалуйста|Camarero, la cuenta, por favor.|Официант, счёт, пожалуйста.\n1|No entiendo|Я не понимаю|Lo siento, no entiendo.|Простите, я не понимаю.\n1|¿Puede repetir?|Можете повторить?|¿Puede repetir, por favor?|Можете повторить, пожалуйста?\n1|Hablo un poco de español|Я немного говорю по-испански|Hablo un poco de español.|Я немного говорю по-испански.\n1|¿Cómo se dice…?|Как сказать…?|¿Cómo se dice «thanks»?|Как сказать «thanks»?\n1|¿Dónde está…?|Где находится…?|¿Dónde está la estación?|Где вокзал?\n1|Tengo hambre|Я голоден|Tengo hambre, vamos a comer.|Я голоден, давай поедим.\n1|Tengo sed|Я хочу пить|Tengo mucha sed.|Мне очень хочется пить.\n1|Tengo que irme|Мне пора идти|Tengo que irme, es tarde.|Мне пора, уже поздно.\n1|¡Salud!|За здоровье!|¡Salud! ¡Por nosotros!|За здоровье! За нас!\n1|¡Buen provecho!|Приятного аппетита!|¡Buen provecho!|Приятного аппетита!\n1|¡Qué bien!|Как здорово!|¡Qué bien, me alegro!|Как здорово, я рад!\n1|¡Qué pena!|Как жаль!|¡Qué pena que no puedas venir!|Как жаль, что ты не можешь прийти!\n1|No pasa nada|Ничего страшного|No pasa nada, tranquilo.|Ничего страшного, не переживай.\n1|Ni idea|Понятия не имею|\"¿Dónde está?\" \"Ni idea.\"|— Где он? — Понятия не имею.\n1|¿En serio?|Серьёзно?|¿En serio? No me lo puedo creer.|Серьёзно? Не могу поверить.\n1|Te quiero|Я тебя люблю; ты мне дорог|Te quiero mucho.|Я тебя очень люблю.\n1|Te echo de menos|Я скучаю по тебе|Te echo de menos.|Я скучаю по тебе.\n1|Me da igual|Мне всё равно|Me da igual, elige tú.|Мне всё равно, выбирай ты.\n1|Depende|Зависит|Depende del día.|Зависит от дня.\n1|A ver|Посмотрим; ну-ка|A ver, déjame pensar.|Так, дай подумать.\n1|Oye|Слушай, эй|Oye, ¿tienes un minuto?|Слушай, у тебя есть минутка?\n1|Mira|Смотри, слушай|Mira, te explico.|Слушай, я объясню.\n1|Vamos|Пойдём; давай|Vamos a casa.|Пойдём домой.\n1|¡Ojalá!|Хорошо бы! Дай бог!|¡Ojalá llueva!|Хоть бы пошёл дождь!\n1|Hasta luego|До скорого|Hasta luego, amigo.|До скорого, друг.\n1|Hasta mañana|До завтра|Hasta mañana, nos vemos.|До завтра, увидимся.\n1|Nos vemos|Увидимся|Nos vemos el lunes.|Увидимся в понедельник.\n1|¡Cuídate!|Береги себя!|¡Cuídate mucho!|Береги себя!\n1|¡Feliz cumpleaños!|С днём рождения!|¡Feliz cumpleaños, Ana!|С днём рождения, Ана!\n1|¡Que te vaya bien!|Удачи тебе!|¡Que te vaya bien en el examen!|Удачи тебе на экзамене!\n1|¿Me ayudas?|Поможешь мне?|¿Me ayudas con esto?|Поможешь мне с этим?\n1|Un momento|Один момент|Un momento, por favor.|Один момент, пожалуйста.", "life": "1|el desayuno|завтрак|El desayuno es a las ocho.|Завтрак в восемь.\n1|el almuerzo|обед|El almuerzo es a las dos.|Обед в два.\n1|la cena|ужин|La cena está lista.|Ужин готов.\n1|el supermercado|супермаркет|Voy al supermercado.|Я иду в супермаркет.\n1|el mercado|рынок|Compro fruta en el mercado.|Я покупаю фрукты на рынке.\n1|la farmacia|аптека|Hay una farmacia aquí cerca.|Здесь рядом есть аптека.\n1|el banco|банк|El banco abre a las nueve.|Банк открывается в девять.\n1|la estación|вокзал, станция|La estación está lejos.|Вокзал далеко.\n1|el aeropuerto|аэропорт|Voy al aeropuerto.|Я еду в аэропорт.\n1|el hotel|отель|Reservé un hotel.|Я забронировал отель.\n1|el billete|билет (Исп.)|Compré el billete.|Я купил билет.\n1|la maleta|чемодан|Mi maleta es azul.|Мой чемодан синий.\n1|el móvil|мобильный (Исп.)|Mi móvil no funciona.|Мой телефон не работает.\n1|el celular|мобильный (Лат. Ам.)|Perdí mi celular.|Я потерял телефон.\n1|la contraseña|пароль|Olvidé la contraseña.|Я забыл пароль.\n1|la cama|кровать|Mi cama es cómoda.|Моя кровать удобная.\n1|el piso|квартира (Исп.)|Alquilo un piso.|Я снимаю квартиру.\n1|el alquiler|аренда|El alquiler es caro.|Аренда дорогая.\n1|el vecino|сосед|Mi vecino es simpático.|Мой сосед приятный.\n1|el jefe|начальник|Mi jefe está de viaje.|Мой начальник в командировке.\n1|la reunión|встреча, совещание|Tengo una reunión.|У меня совещание.\n1|el cumpleaños|день рождения|Mi cumpleaños es en mayo.|Мой день рождения в мае.\n1|el billete|купюра; билет|¿Tienes billetes pequeños?|У тебя есть мелкие купюры?\n1|el tráfico|движение, пробки|Hay mucho tráfico.|Много пробок.\n1|el autobús|автобус|El autobús llega en cinco minutos.|Автобус приедет через пять минут.\n1|el metro|метро|Voy en metro.|Я еду на метро.\n1|la tarjeta|карта|¿Aceptan tarjeta?|Вы принимаете карты?\n1|el efectivo|наличные|Pago en efectivo.|Я плачу наличными.\n1|la receta|рецепт|Me das la receta?|Дашь мне рецепт?\n1|la dirección|адрес; направление|¿Cuál es tu dirección?|Какой у тебя адрес?", "world": "1|uno|один|Tengo uno.|У меня один.\n1|dos|два|Dos cafés, por favor.|Два кофе, пожалуйста.\n1|tres|три|Somos tres.|Нас трое.\n1|cuatro|четыре|Son las cuatro.|Четыре часа.\n1|cinco|пять|Cinco minutos.|Пять минут.\n1|seis|шесть|Tengo seis años.|Мне шесть лет.\n1|siete|семь|Siete días.|Семь дней.\n1|ocho|восемь|A las ocho.|В восемь.\n1|nueve|девять|Nueve euros.|Девять евро.\n1|diez|десять|Diez personas.|Десять человек.\n1|veinte|двадцать|Veinte euros.|Двадцать евро.\n1|cien|сто|Cien por cien.|Сто процентов.\n1|mil|тысяча|Mil gracias.|Тысяча благодарностей.\n1|lunes|понедельник|El lunes trabajo.|В понедельник я работаю.\n1|martes|вторник|El martes tengo clase.|Во вторник у меня занятия.\n1|miércoles|среда|El miércoles voy al gimnasio.|В среду я хожу в зал.\n1|jueves|четверг|El jueves salgo con amigos.|В четверг я гуляю с друзьями.\n1|viernes|пятница|El viernes es mi día favorito.|Пятница — мой любимый день.\n1|sábado|суббота|El sábado hay fiesta.|В субботу вечеринка.\n1|domingo|воскресенье|El domingo descanso.|В воскресенье я отдыхаю.\n1|rojo|красный|Tiene un coche rojo.|У него красная машина.\n1|azul|синий, голубой|El cielo es azul.|Небо голубое.\n1|verde|зелёный|La manzana es verde.|Яблоко зелёное.\n1|amarillo|жёлтый|Me gusta el amarillo.|Мне нравится жёлтый.\n1|negro|чёрный|Llevo un abrigo negro.|На мне чёрное пальто.\n1|blanco|белый|La casa es blanca.|Дом белый.\n1|la hora|час, время|¿Qué hora es?|Который час?\n1|el minuto|минута|Espera un minuto.|Подожди минуту.\n1|el mes|месяц|El mes que viene.|В следующем месяце.\n1|derecha|право, справа|Gira a la derecha.|Поверните направо.\n1|izquierda|лево, слева|Está a la izquierda.|Это слева.\n1|recto|прямо|Sigue todo recto.|Идите всё прямо.\n1|cerca|близко|El hotel está cerca.|Отель близко.\n1|lejos|далеко|La playa está lejos.|Пляж далеко.\n1|temprano|рано|Me levanto temprano.|Я рано встаю.\n1|tarde|поздно|Llego tarde.|Я опаздываю.", "slang": "1|vale|ок, договорились (Исп.)|Vale, nos vemos a las ocho.|Ок, увидимся в восемь.\n1|tío|чувак (Исп.)|Tío, no te lo vas a creer.|Чувак, ты не поверишь.\n1|tía|подруга, девчонка (Исп.)|Tía, qué bien te queda.|Подруга, как тебе это идёт.\n1|guay|круто (Исп.)|¡Qué guay!|Как круто!\n1|mola|нравится, круто (Исп.)|Me mola esta canción.|Мне нравится эта песня.\n1|chulo|классный (Исп.)|Qué chulo tu piso.|Какая классная у тебя квартира.\n1|genial|отлично|¡Genial, me encanta!|Отлично, обожаю!\n1|fenomenal|потрясающе|Todo salió fenomenal.|Всё вышло потрясающе.\n1|flipar|обалдеть (Исп.)|Estoy flipando.|Я в шоке.\n1|qué fuerte|вот это да, жесть|¡Qué fuerte lo que dices!|Вот это да, что ты говоришь!\n1|madre mía|боже мой|¡Madre mía, qué calor!|Боже мой, какая жара!\n1|venga|давай, ну же|Venga, vamos.|Давай, пошли.\n1|anda|да ну, надо же|Anda, ¿en serio?|Да ну, серьёзно?\n1|hombre|да ну, ну что ты (междометие)|Hombre, no te enfades.|Ну что ты, не злись.\n1|en plan|типа|Estaba en plan, no sé.|Я был типа «не знаю».\n1|o sea|то есть, типа|O sea, no quiero ir.|То есть я не хочу идти.\n1|mogollón|куча (Исп.)|Hay mogollón de gente.|Тут куча народу.\n1|currar|вкалывать (Исп.)|Curro mucho esta semana.|Я много вкалываю на этой неделе.\n1|el curro|работа (Исп.)|Tengo mucho curro.|У меня много работы.\n1|la pasta|деньги (Исп.)|No tengo pasta.|У меня нет денег.\n1|colega|приятель (Исп.)|Oye, colega, ¿qué tal?|Слушай, приятель, как дела?\n1|chaval|парень, пацан (Исп.)|Ese chaval es muy majo.|Этот парень очень приятный.\n1|majo|приятный (Исп.)|Tu hermano es muy majo.|Твой брат очень приятный.\n1|el buen rollo|хорошая атмосфера|Aquí hay buen rollo.|Здесь хорошая атмосфера.\n1|el mal rollo|плохая атмосфера, напряг|Qué mal rollo.|Какой напряг.\n1|estar de coña|шутить (Исп.)|Estoy de coña, no te enfades.|Я шучу, не злись.\n1|estar hecho polvo|быть разбитым|Estoy hecho polvo.|Я совершенно разбит.\n1|dar la lata|надоедать|Deja de dar la lata.|Хватит надоедать.\n1|pasarlo bien|хорошо провести время|¡Que lo pases bien!|Хорошо вам провести время!\n1|ligar|флиртовать, клеить|Salgo a ligar.|Я иду знакомиться.\n1|me importa un pimiento|мне плевать (мягко)|Me importa un pimiento.|Мне совершенно плевать.\n1|vaya|вот это да; ну и|¡Vaya día!|Ну и денёк!\n2|güey|чувак (Мекс.)|Güey, ¿qué onda?|Чувак, как дела?\n2|órale|ого, ну давай (Мекс.)|¡Órale, qué padre!|Ого, как круто!\n2|chido|круто (Мекс.)|Está muy chido.|Это очень круто.\n2|padre|классный (Мекс.)|Qué padre tu casa.|Какой классный у тебя дом.\n2|neta|правда (Мекс.)|¿Neta? No puede ser.|Правда? Не может быть.\n2|no manches|да ладно (Мекс.)|¡No manches, qué susto!|Да ладно, ну и испуг!\n2|chamba|работа (Мекс.)|Tengo mucha chamba.|У меня много работы.\n2|la chela|пиво (Мекс.)|Vamos por unas chelas.|Пойдём выпьем пива.\n2|¿Qué onda?|Как дела? (Мекс.)|Hola, ¿qué onda?|Привет, как дела?\n2|ahorita|сейчас, скоро (Мекс.)|Ahorita voy.|Сейчас приду.\n2|parcero|друг (Колумбия)|Parce, ¿cómo vas?|Друг, как дела?\n2|chévere|круто (Лат. Ам.)|¡Qué chévere!|Как круто!\n2|bacán|круто (Чили, Перу)|Está bacán.|Это круто.\n2|che|эй (Аргентина)|Che, ¿venís?|Эй, ты идёшь?\n2|boludo|приятель, дурак (Арг.)|No seas boludo.|Не будь дураком.\n2|el laburo|работа (Арг.)|Tengo laburo.|У меня работа.\n2|el pibe|парень (Арг.)|Ese pibe es genial.|Этот парень классный.\n2|re|очень (Арг.)|Está re bueno.|Это очень круто.\n2|la plata|деньги (Лат. Ам.)|No tengo plata.|У меня нет денег.\n2|el carro|машина (Лат. Ам.)|Compré un carro nuevo.|Я купил новую машину.\n2|la guagua|автобус (Карибы); малыш (Чили)|Tomo la guagua.|Я еду на автобусе.\n2|chamo|парень (Венесуэла)|Chamo, ¿qué pasó?|Парень, что случилось?\n2|pana|друг (Эквадор, Венесуэла)|Eres mi pana.|Ты мой друг.\n2|¡Qué lindo!|Как мило! (Лат. Ам.)|¡Qué lindo tu bebé!|Какой милый у тебя малыш!\n2|¡Qué bárbaro!|Ничего себе! (Арг.)|¡Qué bárbaro!|Ничего себе!\n2|de una|сразу, давай (Арг., Кол.)|De una, vamos.|Давай, пошли.\n2|estar en las nubes|витать в облаках|Está en las nubes.|Он витает в облаках.\n2|ser pan comido|быть проще простого|Es pan comido.|Проще простого.\n2|costar un ojo de la cara|стоить целое состояние|Cuesta un ojo de la cara.|Это стоит целое состояние.\n2|tomar el pelo|разыгрывать|Me estás tomando el pelo.|Ты меня разыгрываешь.\n2|ponerse las pilas|взяться за дело|Ponte las pilas.|Возьмись за дело.\n2|meter la pata|облажаться|Metí la pata.|Я облажался.\n2|no tener ni idea|не иметь ни малейшего понятия|No tengo ni idea.|Понятия не имею.\n2|ser un rollo|быть занудным, скучным|Esa película es un rollo.|Этот фильм — скука.\n2|estar harto|быть сыт по горло|Estoy harto de esto.|Мне это надоело.\n2|¡Ni de broma!|Ни за что!|¿Yo? ¡Ni de broma!|Я? Ни за что!\n2|echar de menos|скучать|Echo de menos mi casa.|Скучаю по дому.\n2|pasar de todo|забить на всё|Paso de todo.|Мне на всё пофиг.\n2|¡Qué morro!|Какая наглость! (Исп.)|¡Qué morro tienes!|Ну у тебя и наглость!\n2|estar como una cabra|быть чокнутым|Estás como una cabra.|Ты чокнутый.\n2|no hay tu tía|ничего не поделать (Исп.)|No hay tu tía.|Ничего не поделаешь.\n3|molar un montón|нравиться очень сильно|Me mola un montón.|Мне это очень нравится.\n3|guay del Paraguay|супер-круто (шутл.)|Está guay del Paraguay.|Это просто супер.\n3|petarlo|взорвать, выступить блестяще|La has petado.|Ты это разнёс.\n3|estar flipando en colores|обалдевать от удивления|Estoy flipando en colores.|Я в полнейшем шоке.\n3|no pegar ojo|не сомкнуть глаз|No pegué ojo.|Я не сомкнул глаз.\n3|ni fu ni fa|ни то ни сё|La peli me pareció ni fu ni fa.|Фильм показался мне ни то ни сё.", "swear": "1|caray|чёрт, надо же|¡Caray, qué susto!|Чёрт, ну и испуг!\n1|jolín|блин (мягко, Исп.)|¡Jolín, qué frío!|Блин, как холодно!\n1|ostras|ничего себе (мягко вместо hostia)|¡Ostras, qué grande!|Ничего себе, какой огромный!\n1|narices|блин, нос (мягко)|¡Qué narices!|Да чёрт возьми!\n1|idiota|идиот|No seas idiota.|Не будь идиотом.\n1|tonto|дурак|Eres un tonto.|Ты дурак.\n1|imbécil|имбецил|Es un imbécil.|Он имбецил.\n1|pesado|зануда, надоедливый|Eres muy pesado.|Ты очень надоедливый.\n2|mierda|дерьмо|¡Mierda, perdí el tren!|Чёрт, я опоздал на поезд!\n2|de mierda|дрянной|Qué día de mierda.|Какой дерьмовый день.\n2|joder|блин, чёрт возьми (универсальное, Исп.)|¡Joder, qué calor!|Чёрт, ну и жара!\n2|coño|чёрт (Исп.)|¡Coño, qué susto!|Чёрт, как я испугался!\n2|carajo|чёрт (Лат. Ам.)|¡Qué carajo!|Какого чёрта!\n2|hostia|ёлки-палки, ничего себе (Исп.)|¡Hostia, qué fuerte!|Ничего себе, вот это да!\n2|cabrón|козёл; в шутку «чувак»|No seas cabrón.|Не будь козлом.\n2|gilipollas|придурок (Исп.)|Eres un gilipollas.|Ты придурок.\n2|pendejo|придурок, дурак (Лат. Ам.)|No seas pendejo.|Не будь придурком.\n2|culo|задница|Tiene el culo gordo.|У него толстая задница.\n2|cojones|яйца; смелость (груб.)|Tiene cojones.|У него есть смелость.\n2|puto|чёртов (усилитель)|Es un puto desastre.|Это чёртова катастрофа.\n2|joder, tío|блин, чувак|Joder, tío, qué mala suerte.|Блин, чувак, как не повезло.\n2|¡Qué mierda!|Вот дерьмо!|¡Qué mierda de día!|Какой дерьмовый день!\n2|me cago en la leche|твою мать (Исп.)|¡Me cago en la leche!|Твою мать!\n2|estar jodido|быть в беде, измотанным|Estoy jodido.|Я влип.\n2|¡Vete a la mierda!|Пошёл к чёрту!|¡Vete a la mierda!|Пошёл к чёрту!\n2|¡Cállate!|Заткнись!|¡Cállate ya!|Заткнись уже!\n3|no mames|да не гони, жесть (Мекс.)|¡No mames, güey!|Да не гони, чувак!\n3|chingar|трахаться; доставать (Мекс.)|Deja de chingar.|Хватит доставать.\n3|chingón|крутой (Мекс.)|Está bien chingón.|Это очень круто.\n3|hijo de puta|сукин сын|Ese hijo de puta me engañó.|Этот сукин сын меня обманул.\n3|de puta madre|отлично, круто (Исп.)|Todo salió de puta madre.|Всё вышло просто круто.\n3|me importa tres cojones|мне плевать (груб.)|Me importa tres cojones.|Мне абсолютно плевать.\n3|la hostia|жесть, ужас (Исп.)|Es la hostia de bueno.|Это просто охрененно.\n3|no me jodas|да ладно тебе, не гони|¡No me jodas!|Да ладно тебе, не гони!\n3|vete al carajo|пошёл к чёрту (Лат. Ам.)|¡Vete al carajo!|Пошёл ты!\n3|hostia puta|вот это да (Исп., груб.)|¡Hostia puta, qué dolor!|Ну и боль!"};
+const SONGS = {};
+const ALLW = [], seenK = new Set();
+CATS.forEach(c => (RAW[c.id] || '').split('\n').forEach(line => {
+  const [t, w, ru, ex, exru] = line.split('|').map(x => x.trim()); if (!w) return;
+  const k = c.id + ':' + w.toLowerCase(); if (seenK.has(k)) return; seenK.add(k);
+  ALLW.push({ k, w, ru, ex, exru: exru || '', cat: c.id, t: +t || 1, song: null });
+}));
+let WORDS = [], UNIQUE = 0;
+const refreshWords = () => { WORDS = ALLW.filter(w => w.cat !== 'swear' || store.ui.adult); UNIQUE = new Set(WORDS.map(w => w.w.toLowerCase())).size; };
+refreshWords();
+const CATBY = Object.fromEntries(CATS.map(c => [c.id, c]));
+
+/* ═══════════ HELPERS ═══════════ */
+const box = w => store.box[w] || 0;
+const known = () => WORDS.filter(x => box(x.k) >= 4).length;
+const level = () => Math.floor(store.xp / 100) + 1;
+const songChip = sg => sg ? `<span class="song">${I.note}<span><small>слово в названии трека</small><b>«${esc(sg[0])}»</b> — ${esc(sg[1])}</span></span>` : '';
+const tqDone = () => Object.keys(store.tq).length;
+const buildDone = () => LESSONS.reduce((a, L, li) => a + L.tasks.filter((_, ti) => store.done[li + '-' + ti]).length, 0);
+const buildTotal = LESSONS.reduce((a, L) => a + L.tasks.length, 0);
+const tqTotal = T.reduce((a, t) => a + t.q.length, 0);
+
+let voices = [];
+try { const lv = () => { voices = speechSynthesis.getVoices(); }; lv(); speechSynthesis.onvoiceschanged = lv; } catch (e) {}
+function speak(text) {
+  try {
+    if (!('speechSynthesis' in window)) throw 0;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/[…]/g, ''));
+    u.lang = 'es-ES'; u.rate = .9;
+    const v = voices.find(v => /es[-_]ES/i.test(v.lang) && /Google|Monica|Mónica|Natural|Elvira/i.test(v.name)) || voices.find(v => /^es/i.test(v.lang));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) { toast('Озвучка недоступна в этом браузере'); }
+}
+const sayBtn = (text, cls = '') => `<button class="say ${cls}" data-say="${encodeURIComponent(text)}" type="button" aria-label="Послушать">${I.sound}<span class="en">${esc(text)}</span></button>`;
+const icoSay = text => `<button class="ico" data-say="${encodeURIComponent(text)}" type="button" aria-label="Послушать">${I.sound}</button>`;
+const blk = (txt, role, small) => `<span class="blk r-${role}">${esc(txt)}${small ? `<small>${esc(small)}</small>` : ''}</span>`;
+
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+const GOAL = 50;
+function addXP(n, x, y) {
+  const lv0 = level();
+  store.xp += n;
+  const td = dayStr(new Date()); if (store.day.d !== td) store.day = { d: td, xp: 0 }; store.day.xp += n;
+  if (level() > lv0) setTimeout(() => { toast('Новый уровень: ' + level() + '!'); confetti(innerWidth / 2, 80, 120); }, 300);
+  const today = dayStr(new Date()), y1 = new Date(); y1.setDate(y1.getDate() - 1);
+  if (store.last !== today) { store.streak = store.last === dayStr(y1) ? store.streak + 1 : 1; store.last = today; }
+  save(); stats(true);
+  if (x != null) { const el = document.createElement('div'); el.className = 'xpf'; el.textContent = '+' + n + ' XP'; el.style.left = x + 'px'; el.style.top = y + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 1200); }
+}
+
+/* confetti in block colours */
+const cv = $('#confetti'), cx = cv.getContext('2d'); let parts = [], raf = 0;
+function fit() { const d = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth * d; cv.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0); }
+addEventListener('resize', fit); fit();
+function confetti(x, y, n = 70) {
+  if (RM) return;
+  const st = getComputedStyle(document.documentElement);
+  const cols = ['--c-s', '--c-v', '--c-o', '--c-p', '--c-t', '--c-x', '--c-q'].map(v => st.getPropertyValue(v).trim());
+  for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + (Math.random() - .5) * 2.2, s = 5 + Math.random() * 9; parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, w: 7 + Math.random() * 7, h: 5 + Math.random() * 4, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: cols[i % cols.length], life: 0 }); }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick() {
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  parts = parts.filter(p => p.life < 140 && p.y < innerHeight + 40);
+  parts.forEach(p => { p.life++; p.vy += .28; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.globalAlpha = Math.min(1, (140 - p.life) / 40); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cx.restore(); });
+  raf = parts.length ? requestAnimationFrame(tick) : 0;
+}
+const centerOf = el => { const b = el.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; };
+
+/* ═══════════ SHELL ═══════════ */
+const ROUTES = [['start', 'Старт'], ['build', 'Строить'], ['tenses', 'Времена'], ['words', 'Слова'], ['talk', 'Разговор'], ['chat', 'Чат'], ['train', 'Тренинг'], ['games', 'Игры']];
+function navs(cur) {
+  const h = ROUTES.map(([id, n]) => `<a href="#${id}" class="${id === cur ? 'on' : ''}" ${id === cur ? 'aria-current="page"' : ''}>${I[id]}<span>${n}</span></a>`).join('');
+  $('#nav').innerHTML = h; $('#tabbar').innerHTML = h;
+}
+function stats(bump) {
+  const pr = (store.xp % 100) / 100, C = 2 * Math.PI * 10;
+  $('#stats').innerHTML = `<span class="lvl" title="Уровень: каждые 100 XP"><svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="10" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="3"/><circle cx="13" cy="13" r="10" fill="none" stroke="var(--c-p)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pr)}" transform="rotate(-90 13 13)"/></svg>Ур. ${level()}</span><span class="stat" title="Опыт">${I.bolt}${store.xp}</span><span class="stat" title="Дней подряд">${I.flame}${store.streak}</span><span class="stat" title="Выученные слова">${I.book}${known()}/${WORDS.length}</span>`;
+  if (bump) $$('#stats .stat').forEach(s => s.classList.add('bump'));
+}
+let timers = [];
+const clearTimers = () => { timers.forEach(t => clearInterval(t)); timers = []; };
+function route() {
+  let r = location.hash.slice(1);
+  if (!VIEWS[r]) r = 'start';
+  clearTimers(); navs(r); stats();
+  const v = $('#view'); v.className = 'view'; void v.offsetWidth; v.className = 'view';
+  VIEWS[r](v);
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+}
+addEventListener('hashchange', route);
+
+/* ═══════════ VIEW: START ═══════════ */
+const HERO = [[[["Yo", "s"], ["bebo", "v"], ["café", "o"], ["en casa", "p"], ["cada mañana", "t"]], "Я пью кофе дома каждое утро."], [[["Ella", "s"], ["está leyendo", "v"], ["un libro", "o"], ["en el parque", "p"], ["ahora mismo", "t"]], "Она сейчас читает книгу в парке."], [[["Nosotros", "s"], ["vamos a visitar", "v"], ["a unos amigos", "o"], ["en Madrid", "p"], ["el año que viene", "t"]], "В следующем году мы навестим друзей в Мадриде."], [[["Ellos", "s"], ["han construido", "v"], ["una casa nueva", "o"], ["junto al mar", "p"], ["este año", "t"]], "В этом году они построили новый дом у моря."]];
+function viewStart(v) {
+  const steps = [
+    ['build', 'Собери предложение', `${LESSONS.length} коротких уроков: порядок слов, вопросы, отрицания.`, 'var(--c-s)', buildDone() / buildTotal, `${buildDone()} / ${buildTotal} заданий`],
+    ['tenses', 'Пойми времена', '9 форм: от presente до condicional. Каждая с таблицей спряжения, примерами и тестом.', 'var(--c-v)', tqDone() / tqTotal, `${tqDone()} / ${tqTotal} вопросов`],
+    ['words', 'Возьми слова', `${UNIQUE} слов и выражений: самая база, живая разговорка и маты 18+.`, 'var(--c-o)', known() / WORDS.length, `${known()} / ${WORDS.length} выучено`],
+    ['train', 'Тренируй каждый день', 'Карточки с интервальным повторением и тесты «вставь слово».', 'var(--c-t)', Math.min(1, store.streak / 7), `${store.streak} дн. подряд`]
+  ];
+  v.innerHTML = `
+  <section class="hero">
+    <div class="stickers" aria-hidden="true"><svg class="a" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l2.9 6.6L22 9l-5.4 4.8L18.2 21 12 17.3 5.8 21l1.6-7.2L2 9l7.1-1.4z"/></svg><svg class="b" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M2 14c3-6 5 6 8 0s5 6 8 0 3 4 4 2"/></svg><svg class="c" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="9" width="18" height="12" rx="3"/><rect x="5" y="5" width="4" height="4" rx="1.5"/><rect x="13" y="5" width="4" height="4" rx="1.5"/></svg></div>
+    <div class="hero-copy">
+      <span class="eyebrow">Испанский из кубиков</span>
+      <h1>Собирай испанский, как <em>конструктор</em></h1>
+      <p>Каждая часть предложения — свой цвет. Сначала поймёшь, как они стыкуются, потом разберёшься со временами и наберёшь слова, на которых звучит уверенная речь.</p>
+      <div class="cta"><a class="btn c" href="#build">Начать с предложений ${I.arrow}</a><a class="btn ghost" href="#words">Сразу к словам</a></div>
+    </div>
+    <div class="plate" id="plate" role="button" tabindex="0" aria-label="Послушать предложение">
+      <div class="meta"><span class="eyebrow">Собирается само · нажми, чтобы послушать</span>${I.sound.replace('<svg', '<svg width="20" height="20" style="color:var(--c-s)"')}</div>
+      <div class="lane" id="lane"></div>
+      <p class="ru" id="heroRu"></p>
+      <div class="legend">${['s', 'v', 'o', 'p', 't'].map(r => `<span><i style="--r:var(--c-${r})"></i>${ROLE[r]}</span>`).join('')}</div>
+    </div>
+  </section>
+  <div class="ticker" aria-hidden="true"><div class="ticker-in"><span style="--c:var(--c-s)">vale</span><span style="--c:var(--c-v)">guay</span><span style="--c:var(--c-o)">tío</span><span style="--c:var(--c-p)">mola</span><span style="--c:var(--c-t)">flipar</span><span style="--c:var(--c-x)">qué fuerte</span><span style="--c:var(--c-q)">madre mía</span><span style="--c:var(--c-s)">venga</span><span style="--c:var(--c-v)">en plan</span><span style="--c:var(--c-o)">o sea</span><span style="--c:var(--c-p)">buen rollo</span><span style="--c:var(--c-t)">chulo</span><span style="--c:var(--c-x)">órale</span><span style="--c:var(--c-q)">chido</span><span style="--c:var(--c-s)">no manches</span><span style="--c:var(--c-v)">che</span><span style="--c:var(--c-o)">parce</span><span style="--c:var(--c-p)">chévere</span><span style="--c:var(--c-t)">qué padre</span><span style="--c:var(--c-x)">neta</span><span style="--c:var(--c-s)">vale</span><span style="--c:var(--c-v)">guay</span><span style="--c:var(--c-o)">tío</span><span style="--c:var(--c-p)">mola</span><span style="--c:var(--c-t)">flipar</span><span style="--c:var(--c-x)">qué fuerte</span><span style="--c:var(--c-q)">madre mía</span><span style="--c:var(--c-s)">venga</span><span style="--c:var(--c-v)">en plan</span><span style="--c:var(--c-o)">o sea</span><span style="--c:var(--c-p)">buen rollo</span><span style="--c:var(--c-t)">chulo</span><span style="--c:var(--c-x)">órale</span><span style="--c:var(--c-q)">chido</span><span style="--c:var(--c-s)">no manches</span><span style="--c:var(--c-v)">che</span><span style="--c:var(--c-o)">parce</span><span style="--c:var(--c-p)">chévere</span><span style="--c:var(--c-t)">qué padre</span><span style="--c:var(--c-x)">neta</span></div></div>
+  <section class="path">${steps.map(([id, h, p, r, k, lbl], i) => `
+    <a class="card step" href="#${id}" style="--r:${r}"><span class="num">${i + 1}</span><h3>${h}</h3><p>${p}</p><div class="bar"><i data-w="${Math.round(k * 100)}"></i></div><span class="eyebrow">${lbl}</span></a>`).join('')}
+  </section>
+  <div class="banners"><a class="card gbanner" href="#talk"><div><span class="eyebrow">Новое · Разговор</span><h3>Чаты, сленг и живые диалоги</h3><p>Читай переписки как в телефоне, нажимай на сленг и узнавай, что он значит.</p></div><div class="stack"><span class="blk r-x" style="--rot:5deg">guay</span><span class="blk r-q" style="--rot:-5deg">vale</span><span class="blk r-p" style="--rot:3deg">tío</span></div></a><a class="card gbanner" href="#chat"><div><span class="eyebrow">Новое · Чат-тренинг</span><h3>Бесконечная переписка</h3><p>Бот пишет, ты собираешь ответ из слов. Каждый раз новая ситуация.</p></div><div class="stack"><span class="blk r-o" style="--rot:-4deg">Voy</span><span class="blk r-s" style="--rot:4deg">a ver</span></div></a><a class="card gbanner" href="#games"><div><span class="eyebrow">Новое · Игры</span><h3>Спид-раунд, пары и «Угадай трек»</h3><p>Разгоняй комбо, ищи пары и угадывай, какое слово из словаря прячется в названии хита.</p></div><div class="stack"><span class="blk r-v" style="--rot:-6deg">speed</span><span class="blk r-o" style="--rot:4deg">pairs</span><span class="blk r-t" style="--rot:-3deg">tracks</span></div></a></div>
+  <section class="card goal" id="goal"></section>
+  <section class="kpis">
+    <div class="card kpi"><b data-count="${store.xp}">0</b><span>очков опыта</span></div>
+    <div class="card kpi"><b data-count="${known()}">0</b><span>слов в активном словаре</span></div>
+    <div class="card kpi"><b data-count="${buildDone() + tqDone()}">0</b><span>заданий решено</span></div>
+    <div class="card kpi"><b data-count="${store.streak}">0</b><span>дней подряд</span></div>
+  </section>
+  <p class="hint" style="margin-top:18px">Хочешь знать, на чём это построено? <a href="#science" style="color:var(--c-s)">Научная база</a></p>`;
+  { const td = dayStr(new Date()), dx = store.day.d === td ? store.day.xp : 0, p = Math.min(1, dx / GOAL), C = 2 * Math.PI * 32;
+    $('#goal').innerHTML = `<svg viewBox="0 0 76 76"><circle cx="38" cy="38" r="32" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="38" cy="38" r="32" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 38 38)" id="goalArc" style="transition:stroke-dashoffset 1.2s cubic-bezier(.2,1,.3,1)"/><text x="38" y="44" text-anchor="middle" font-family="Geologica,sans-serif" font-weight="900" font-size="18" fill="var(--ink)">${Math.round(p * 100)}%</text></svg><div><span class="eyebrow">Цель дня</span><div><b>${dx} / ${GOAL} XP</b></div><p style="color:var(--muted)">${p >= 1 ? 'Цель выполнена. Огонь держится ещё день.' : 'Один урок или 15 карточек — и цель закрыта.'}</p></div>`;
+    requestAnimationFrame(() => { const a = $('#goalArc'); if (a) a.style.strokeDashoffset = C * (1 - p); }); }
+  requestAnimationFrame(() => $$('.bar i', v).forEach(i => i.style.width = i.dataset.w + '%'));
+  $$('[data-count]', v).forEach(el => { const n = +el.dataset.count; if (!n) return; let k = 0; const t = setInterval(() => { k++; el.textContent = Math.round(n * Math.min(1, k / 30)); if (k >= 30) clearInterval(t); }, 25); timers.push(t); });
+  let hi = 0;
+  const show = () => {
+    const [parts, ru] = HERO[hi % HERO.length];
+    $('#lane').innerHTML = parts.map(([t, r], i) => `<span class="blk r-${r} drop" style="animation-delay:${i * 110}ms">${esc(t)}<small>${ROLE[r]}</small></span>`).join('');
+    const ruEl = $('#heroRu'); ruEl.style.opacity = 0; setTimeout(() => { ruEl.textContent = ru; ruEl.style.opacity = 1; }, 650);
+  };
+  show(); timers.push(setInterval(() => { hi++; show(); }, 4200));
+  const sayHero = () => speak(HERO[hi % HERO.length][0].map(p => p[0]).join(' '));
+  $('#plate').addEventListener('click', sayHero);
+  $('#plate').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sayHero(); } });
+}
+
+/* ═══════════ VIEW: BUILD ═══════════ */
+const exState = {};
+function viewBuild(v) {
+  const li = Math.min(store.ui.lesson, LESSONS.length - 1);
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Шаг 1 · Конструктор</span><h1>Как строить предложение</h1><p>Каждый кубик — роль в предложении. Цвет подсказывает, где ему стоять. Читай правило, слушай примеры, собирай сам.</p></div>
+  <div class="build"><div class="lessons" id="lessons"></div><div class="lesson" id="lesson"></div></div>`;
+  renderLessons(li); renderLesson(li);
+}
+function renderLessons(li) {
+  $('#lessons').innerHTML = LESSONS.map((L, i) => {
+    const done = L.tasks.every((_, ti) => store.done[i + '-' + ti]);
+    return `<button type="button" class="${i === li ? 'on' : ''} ${done ? 'done' : ''}" data-lesson="${i}"><span class="n">${done ? I.check.replace('<svg', '<svg width="16" height="16"') : i + 1}</span><span><strong>${L.t}</strong><small>${L.s}</small></span></button>`;
+  }).join('');
+}
+function renderLesson(li) {
+  const L = LESSONS[li];
+  $('#lesson').innerHTML = `
+    <article class="card lesson-head">
+      <span class="eyebrow">Урок ${li + 1} из ${LESSONS.length}</span>
+      <h2>${L.t}</h2>
+      <p class="body">${L.body}</p>
+      <div class="formula">${L.f.map(([t, r, s]) => r ? blk(t, r, s) : `<span class="blk plus">${esc(t)}</span>`).join('')}</div>
+      <div class="exlist">${L.ex.map(([en, ru]) => `<div class="exl">${sayBtn(en)}<span class="ru">${esc(ru)}</span></div>`).join('')}</div>
+      ${L.aux ? `<div class="tbl"><table class="auxt"><thead><tr><th>Время</th><th>Помощник</th><th>Вопрос</th></tr></thead><tbody>${AUX.map(a => `<tr><td>${a[0]}</td><td><b>${a[1]}</b></td><td class="en" style="font-size:17px">${esc(a[2])}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      <div class="tip">${I.bulb}<p>${esc(L.tip)}</p></div>
+    </article>
+    ${L.tasks.map((t, ti) => exCard(li, ti, t)).join('')}
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      ${li > 0 ? `<button class="btn ghost" data-lesson="${li - 1}" type="button">← Назад</button>` : '<span></span>'}
+      ${li < LESSONS.length - 1 ? `<button class="btn c" data-lesson="${li + 1}" type="button">Следующий урок ${I.arrow}</button>` : `<a class="btn c" href="#tenses">К временам ${I.arrow}</a>`}
+    </div>`;
+  L.tasks.forEach((t, ti) => paintEx(li + '-' + ti));
+}
+function exCard(li, ti, t) {
+  const id = li + '-' + ti;
+  if (!exState[id] || store.done[id]) exState[id] = { pool: shuffle(t.p.map((_, i) => i)), slot: [] };
+  if (store.done[id]) exState[id] = { pool: [], slot: t.p.map((_, i) => i) };
+  return `<section class="card ex ${store.done[id] ? 'ok' : ''}" data-ex="${id}">
+    <div class="ex-top"><p class="ex-ru"><span>Собери по-испански</span>«${esc(t.ru)}»</p>${icoSay(t.p.map(p => p[0]).join(' '))}</div>
+    <div class="slot" data-slot></div>
+    <div class="pool" data-pool></div>
+    <div class="ex-act"><button class="btn c sm" data-check type="button">${I.check}Проверить</button><button class="btn ghost sm" data-reset type="button">${I.undo}Сначала</button><button class="btn ghost sm" data-hint type="button">${I.bulb}Подсказка</button><span class="ex-msg" data-msg>${store.done[id] ? 'Готово!' : ''}</span></div>
+  </section>`;
+}
+function exTask(id) { const [li, ti] = id.split('-').map(Number); return LESSONS[li].tasks[ti]; }
+function paintEx(id, popIdx) {
+  const card = $(`[data-ex="${id}"]`); if (!card) return;
+  const t = exTask(id), st = exState[id];
+  const chip = (i, where) => `<button type="button" class="blk r-${t.p[i][1]} ${i === popIdx ? 'pop' : ''}" data-chip="${i}" data-where="${where}">${esc(t.p[i][0])}</button>`;
+  $('[data-slot]', card).innerHTML = st.slot.map(i => chip(i, 'slot')).join('');
+  $('[data-pool]', card).innerHTML = st.pool.map(i => chip(i, 'pool')).join('');
+}
+function exClick(card, e) {
+  const id = card.dataset.ex, st = exState[id], t = exTask(id);
+  const c = e.target.closest('[data-chip]');
+  if (c && !store.done[id]) {
+    const i = +c.dataset.chip;
+    if (c.dataset.where === 'pool') { st.pool = st.pool.filter(x => x !== i); st.slot.push(i); }
+    else { st.slot = st.slot.filter(x => x !== i); st.pool.push(i); }
+    $('[data-msg]', card).textContent = ''; $('[data-msg]', card).className = 'ex-msg';
+    paintEx(id, i); return;
+  }
+  if (e.target.closest('[data-reset]') && !store.done[id]) { exState[id] = { pool: shuffle(t.p.map((_, i) => i)), slot: [] }; paintEx(id); return; }
+  if (e.target.closest('[data-hint]')) {
+    const msg = $('[data-msg]', card); msg.className = 'ex-msg';
+    msg.innerHTML = 'Порядок ролей: ' + t.p.map(p => `<b style="color:var(--c-${p[1]})">${ROLE[p[1]]}</b>`).join(' → ');
+    return;
+  }
+  if (e.target.closest('[data-check]') && !store.done[id]) {
+    const msg = $('[data-msg]', card);
+    if (st.pool.length) { msg.className = 'ex-msg badm'; msg.textContent = 'Используй все кубики.'; card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); return; }
+    const got = st.slot.map(i => t.p[i][0]).join(' '), want = t.p.map(p => p[0]).join(' ');
+    if (got === want) {
+      store.done[id] = 1; save(); card.classList.add('ok'); msg.className = 'ex-msg good'; msg.textContent = 'Отлично! +10 XP';
+      const [x, y] = centerOf(e.target.closest('[data-check]')); confetti(x, y); addXP(10, x, y - 20); speak(want);
+      renderLessons(+id.split('-')[0]);
+    } else {
+      const wrong = st.slot.findIndex((i, k) => t.p[i][0] !== t.p[k][0]);
+      const el = $$('[data-slot] .blk', card)[wrong]; if (el) el.classList.add('wrong');
+      msg.className = 'ex-msg badm'; msg.textContent = 'Почти! Проверь подсвеченный кубик.';
+    }
+  }
+}
+
+/* ═══════════ VIEW: TENSES ═══════════ */
+function viewTenses(v) {
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Шаг 2 · Времена</span><h1>Девять форм — и ты говоришь о чём угодно</h1><p>В испанском хватает девяти форм, чтобы говорить о настоящем, прошлом и будущем. Нажми на любую: увидишь, когда она нужна, полную таблицу спряжения, примеры и тест. Звёздочкой отмечены шесть форм, которые нужны в первую очередь.</p></div>
+  <div class="tgrid" id="matrix">${T.map(cellH).join('')}</div>
+  <section class="card tdetail" id="tdetail"></section>`;
+  renderTense(TBY[store.ui.tense] ? store.ui.tense : 'pres', false);
+}
+const cellH = t => `<button type="button" class="cell ${t.id === store.ui.tense ? 'on' : ''}" data-t="${t.id}" style="--r:${t.c}">${t.star ? '<span class="star">TOP</span>' : ''}<b>${t.n}</b><span class="en">${esc(t.mini)}</span></button>`;
+function tlSVG(type, color) {
+  const Y = 78, X = x => x;
+  let s = `<line x1="24" y1="${Y}" x2="576" y2="${Y}" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/><path d="M568 ${Y - 6} 578 ${Y} 568 ${Y + 6}" fill="none" stroke="var(--line)" stroke-width="3"/>
+    <line x1="300" y1="30" x2="300" y2="118" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 5"/><text x="300" y="134" text-anchor="middle" font-weight="700">СЕЙЧАС</text>
+    <text x="70" y="134" text-anchor="middle">прошлое</text><text x="530" y="134" text-anchor="middle">будущее</text>`;
+  let d = 0;
+  const dly = () => `style="animation-delay:${(d++) * 180}ms"`;
+  const dot = (x, lab) => { s += `<circle class="popin" ${dly()} cx="${X(x)}" cy="${Y}" r="10" fill="${color}"/>`; if (lab) s += `<text x="${x}" y="${Y - 22}" text-anchor="middle" style="fill:var(--ink)">${lab}</text>`; };
+  const dots = (x1, x2, n, lab) => { for (let i = 0; i < n; i++) s += `<circle class="popin" style="animation-delay:${i * 70}ms" cx="${x1 + (x2 - x1) * i / (n - 1)}" cy="${Y}" r="6" fill="${color}"/>`; if (lab) s += `<text x="${(x1 + x2) / 2}" y="${Y - 22}" text-anchor="middle" style="fill:var(--ink)">${lab}</text>`; };
+  const wave = (x1, x2, lab) => { let p = `M${x1} ${Y}`; for (let x = x1; x <= x2; x += 4) p += ` L${x} ${(Y + Math.sin((x - x1) / 9) * 9).toFixed(1)}`; const len = Math.round((x2 - x1) * 1.5); s += `<path class="draw" ${dly()} style="--len:${len}" d="${p}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round"/>`; if (lab) s += `<text x="${(x1 + x2) / 2}" y="${Y - 24}" text-anchor="middle" style="fill:var(--ink)">${lab}</text>`; };
+  const arrow = (x1, x2) => { const len = x2 - x1; s += `<path class="draw" ${dly()} style="--len:${len + 20}" d="M${x1} ${Y - 30} Q${(x1 + x2) / 2} ${Y - 58} ${x2} ${Y - 16}" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="0"/><path class="popin" ${dly()} d="M${x2 - 8} ${Y - 26} L${x2} ${Y - 14} L${x2 + 6} ${Y - 28}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`; };
+  const ref = (x, lab) => { s += `<line class="popin" ${dly()} x1="${x}" y1="${Y - 16}" x2="${x}" y2="${Y + 16}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><text x="${x}" y="${Y + 34}" text-anchor="middle" style="fill:var(--ink)">${lab}</text>`; };
+  const star = (x, lab) => { s += `<path class="popin" ${dly()} d="M${x} ${Y - 14} l4 9 10 1-7.5 6.5 2.3 9.8L${x} ${Y + 6}l-8.8 5.3 2.3-9.8L${x - 14} ${Y - 4}l10-1z" fill="${color}"/>`; if (lab) s += `<text x="${x}" y="${Y + 34}" text-anchor="middle" style="fill:var(--ink)">${lab}</text>`; };
+  ({
+    pres_simple: () => dots(60, 540, 9, 'всегда / регулярно'),
+    pres_cont: () => wave(250, 350, 'идёт прямо сейчас'),
+    pres_perf: () => { dot(150, 'когда-то'); arrow(150, 300); star(300, 'результат'); },
+    pres_perf_cont: () => wave(130, 300, 'с тех пор и до сих пор'),
+    past_simple: () => dot(160, 'вчера — и всё'),
+    past_cont: () => { wave(100, 230, 'процесс'); ref(170, 'в 8 вечера'); },
+    past_perf: () => { dot(100, 'сначала'); arrow(100, 210); ref(210, 'потом'); },
+    past_perf_cont: () => { wave(70, 210, 'длилось'); ref(210, 'до момента'); },
+    fut_simple: () => dot(450, 'решу / сделаю'),
+    going_to: () => { dot(300, 'план уже есть'); arrow(300, 450); dot(450); },
+    fut_cont: () => { wave(380, 510, 'в процессе'); ref(440, 'завтра в 10'); },
+    fut_perf: () => { dot(400, 'готово'); arrow(400, 510); ref(510, 'к пятнице'); },
+    fut_perf_cont: () => { wave(320, 510, 'будет длиться'); ref(510, 'к моменту'); }
+  })[type]();
+  return `<svg class="tl" viewBox="0 0 600 150" role="img" aria-label="Шкала времени">${s}</svg>`;
+}
+function renderTense(id, scroll) {
+  const t = TBY[id] || TBY.pres; store.ui.tense = t.id; save();
+  $$('.cell').forEach(c => c.classList.toggle('on', c.dataset.t === t.id));
+  const col = t.c, vb = VERBS[store.ui.verb] ? store.ui.verb : 'hablar';
+  const el = $('#tdetail'); el.style.setProperty('--r', col);
+  const forms = conj(vb, t.id);
+  el.innerHTML = `
+    <div class="tcol">
+      <span class="eyebrow">${t.star ? 'TOP · начни с этого' : 'Когда пригодится'}</span>
+      <div><h2>${t.n}</h2><span class="runame">${t.ru}</span></div>
+      <p class="idea">${esc(t.idea)}</p>
+      ${tlSVG(t.tl, col)}
+      <div class="forms">${[['+', 'var(--ok)'], ['−', 'var(--bad)'], ['?', 'var(--c-q)']].map(([k, c]) => `<div class="form" style="--r:${c}"><span class="sg">${k}</span><code>${esc(t.f[k])}</code></div>`).join('')}</div>
+      <span class="eyebrow">Спряжение · нажми на форму, чтобы послушать</span>
+      <div class="cats">${Object.keys(VERBS).map(x => `<button class="chip ${x === vb ? 'on' : ''}" data-verb="${x}" type="button">${x}</button>`).join('')}</div>
+      <div class="tbl"><table class="auxt"><tbody>${PRON.map((p, i) => `<tr><td style="color:var(--muted)">${p}</td><td><button class="say" data-say="${encodeURIComponent(forms[i])}" type="button"><span class="en" style="font-size:21px">${esc(forms[i])}</span></button></td></tr>`).join('')}</tbody></table></div>
+    </div>
+    <div class="tcol">
+      <span class="eyebrow">Примеры · нажми, чтобы послушать</span>
+      <div class="exlist">${t.ex.map(([en, ru]) => `<div class="exl">${sayBtn(en)}<span class="ru">${esc(ru)}</span></div>`).join('')}</div>
+      <span class="eyebrow">Слова-маркеры</span>
+      <div class="sigs">${t.sig.map(x => `<span>${esc(x)}</span>`).join('')}</div>
+      <div class="tip">${I.bulb}<p>${esc(t.tip)}</p></div>
+      <span class="eyebrow">Проверь себя</span>
+      <div class="quiz">${t.q.map((q, qi) => { const key = t.id + qi, opts = store.tq[key] ? [q[1], q[2], q[3]] : shuffle([q[1], q[2], q[3]]); const done = store.tq[key];
+        return `<div class="qi" data-q="${key}"><p class="qs"><span class="en">${esc(q[0]).replace('___', `<span class="gap">${done ? esc(q[1]) : '&nbsp;?&nbsp;'}</span>`)}</span></p><div class="qopts">${opts.map(o => `<button type="button" class="qopt ${done && o === q[1] ? 'right' : ''}" data-opt="${encodeURIComponent(o)}" ${done ? 'disabled' : ''}>${esc(o)}</button>`).join('')}</div><p class="why ${done ? 'good' : ''}">${done ? esc(q[4]) : ''}</p></div>`; }).join('')}</div>
+    </div>`;
+  if (scroll) el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' });
+}
+function tenseQuiz(btn) {
+  const qi = btn.closest('[data-q]'), key = qi.dataset.q;
+  const t = TBY[store.ui.tense], q = t.q[+key.slice(t.id.length)];
+  const o = decodeURIComponent(btn.dataset.opt);
+  if (o === q[1]) {
+    btn.classList.add('right'); $$('.qopt', qi).forEach(b => b.disabled = true);
+    $('.gap', qi).textContent = q[1]; const w = $('.why', qi); w.textContent = q[4]; w.className = 'why good';
+    if (!store.tq[key]) { store.tq[key] = 1; save(); const [x, y] = centerOf(btn); addXP(5, x, y - 20); confetti(x, y, 30); }
+    speak(q[0].replace('___', q[1]));
+  } else {
+    btn.classList.add('no'); btn.disabled = true; const w = $('.why', qi); w.textContent = 'Не то. Подумай, что тут важнее: момент, процесс или результат.'; w.className = 'why';
+  }
+}
+let det = { r: null, c: null };
+function detectPick() {}
+
+/* ═══════════ VIEW: WORDS ═══════════ */
+let wq = '', hideKnown = false, openW = null, tierF = 0, musicOnly = false, wLimit = 60;
+function viewWords(v) {
+  const wpool = WORDS.filter(w => w.cat !== 'swear'), wd = wpool[Math.floor(Date.now() / 864e5) % wpool.length], wc = CATBY[wd.cat];
+  wLimit = 60;
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Шаг 3 · Активный словарь</span><h1>${UNIQUE} слов для свободной речи</h1><p>Самая база испанского: глаголы, существительные, прилагательные, связки, фразы, числа и дни. Плюс живая разговорка и отдельный раздел 18+. Нажми на карточку, чтобы увидеть пример с переводом и услышать озвучку.</p></div>
+  <section class="card wotd" style="--r:${wc.r}">
+    <div style="display:flex;flex-direction:column;gap:6px;position:relative;z-index:1"><span class="eyebrow">Слово дня · ${wc.n} · ${tierName(wd)}</span><div class="big">${esc(wd.w)}</div><p style="font-size:18px;font-weight:600">${esc(wd.ru)}</p><p class="en" style="font-size:20px;color:var(--muted)">${esc(wd.ex)}</p>${songChip(wd.song)}</div>
+    <div style="display:flex;gap:8px;position:relative;z-index:1">${icoSay(wd.w)}<button class="btn sm c" data-say="${encodeURIComponent(wd.ex)}" type="button">${I.sound}Пример</button></div>
+  </section>
+  <div class="wtools">
+    <div class="search"><input id="wsearch" type="search" placeholder="Найти слово или перевод…" value="${esc(wq)}" autocomplete="off"><button class="chip ${hideKnown ? 'on' : ''}" id="hideKnown" type="button">Скрыть выученные</button><a class="btn sm" href="#train">${I.cards}Тренировать</a></div>
+    <div class="cats" id="tiers"></div>
+    <div class="cats" id="cats"></div>
+  </div>
+  <p class="wcount" id="wcount"></p>
+  <div class="wgrid" id="wgrid"></div>
+  <div id="wmore" style="display:flex;justify-content:center;margin-top:18px"></div>`;
+  paintCats(); paintWords();
+  $('#wsearch').addEventListener('input', e => { wq = e.target.value; wLimit = 60; paintWords(); });
+}
+function wFilter() {
+  const cat = store.ui.cat, q = wq.trim().toLowerCase();
+  return WORDS.filter(w => (cat === 'all' || w.cat === cat) && (!tierF || w.t === tierF) && (!musicOnly || w.song) && (!q || w.w.toLowerCase().includes(q) || w.ru.toLowerCase().includes(q)) && (!hideKnown || box(w.k) < 4));
+}
+function paintCats() {
+  const cat = store.ui.cat;
+  $('#tiers').innerHTML = [[0, 'Все уровни'], [1, 'База'], [2, 'Уверенно'], [3, 'Продвинуто']].map(([t, n]) => `<button class="chip ${tierF === t ? 'on' : ''}" data-tier="${t}" type="button">${t ? `<span class="tier t${t}" style="position:static;--r:currentColor"><i></i><i></i><i></i></span>` : ''}${n} <b>${t ? WORDS.filter(w => w.t === t).length : WORDS.length}</b></button>`).join('');
+  $('#cats').innerHTML = `<button class="chip ${cat === 'all' ? 'on' : ''}" data-cat="all" type="button">Все темы</button>` + CATS.map(c => `<button class="chip ${cat === c.id ? 'on' : ''}" data-cat="${c.id}" style="--r:${c.r}" type="button"><i class="dot"></i>${c.n} <b>${c.id === 'swear' && !store.ui.adult ? '18+' : WORDS.filter(w => w.cat === c.id).length}</b></button>`).join('');
+}
+function paintWords() {
+  const list = wFilter();
+  const g = $('#wgrid');
+  if (store.ui.adult && !$('[data-adult-off]')) $('#cats').insertAdjacentHTML('beforeend', '<button class="chip" data-adult-off type="button">Скрыть 18+</button>');
+  if (store.ui.cat === 'swear' && !store.ui.adult) {
+    $('#wcount').textContent = ''; $('#wmore').innerHTML = '';
+    g.innerHTML = `<div class="card gate" style="grid-column:1/-1"><span class="eyebrow">Только для взрослых · 18+</span><h3>Здесь настоящие испанские маты</h3><p>Они нужны, чтобы понимать фильмы, треки, игровые чаты и живую речь. Для каждого слова указана жёсткость: мягко, средне, жёстко. На работе, на собеседовании и с незнакомыми людьми так лучше не говорить. Многие слова зависят от страны: в скобках указано, где их говорят. Оскорбления по расе, национальности и ориентации я сюда сознательно не добавлял.</p><button class="btn" data-adult type="button">Мне есть 18, показать</button></div>`;
+    return;
+  }
+  $('#wcount').textContent = list.length ? `Показано ${Math.min(wLimit, list.length)} из ${list.length}` : '';
+  if (!list.length) { g.innerHTML = `<div class="card empty">Ничего не нашлось. Попробуй другое слово или сбрось фильтры.</div>`; $('#wmore').innerHTML = ''; return; }
+  g.innerHTML = list.slice(0, wLimit).map((w, ix) => { const k = box(w.k) >= 4, c = CATBY[w.cat]; return `<div class="w ${openW === w.k ? 'open' : ''}" style="--r:${c.r};--i:${ix % 14}" data-w="${encodeURIComponent(w.k)}" tabindex="0" role="button" aria-expanded="${openW === w.k}">
+    ${k ? `<span class="kn" title="Выучено">${I.check}</span>` : ''}
+    <span class="wd">${esc(w.w)}${w.song ? `<span class="nt" title="Есть в названии трека">${I.note}</span>` : ''}</span><span class="tr">${esc(w.ru)}</span>
+    <span class="tier t${w.t}" title="${tierName(w)}"><i></i><i></i><i></i></span>
+    <div class="more">${exBlock(w)}${songChip(w.song)}<div class="acts">${icoSay(w.w)}<button class="btn sm ghost" type="button" data-say="${encodeURIComponent(w.ex)}">${I.sound}Пример</button><button class="btn sm ${k ? 'ghost' : 'c'}" type="button" data-know="${encodeURIComponent(w.k)}">${k ? 'Вернуть в тренировку' : I.check + 'Знаю'}</button></div></div>
+  </div>`; }).join('');
+  $('#wmore').innerHTML = list.length > wLimit ? `<button class="btn ghost" data-more type="button">Показать ещё ${Math.min(60, list.length - wLimit)} · осталось ${list.length - wLimit}</button>` : '';
+}
+
+/* ═══════════ VIEW: TRAIN (Leitner spaced repetition) ═══════════ */
+const MODES = [
+  { id: 'ru-en', n: 'Русский → Español', d: 'Вспомни слово сам. Лучший режим для активного словаря.', r: 'var(--c-s)', i: I.cards },
+  { id: 'en-ru', n: 'Español → русский', d: 'Узнай слово и вспомни перевод.', r: 'var(--c-o)', i: I.swap },
+  { id: 'gap', n: 'Вставь слово', d: 'Выбери слово, которое подходит в предложение.', r: 'var(--c-v)', i: I.gap },
+  { id: 'tense', n: 'Тест по временам', d: '10 случайных вопросов из всех форм.', r: 'var(--c-t)', i: I.clock }
+];
+let sess = null;
+function viewTrain(v) {
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Шаг 4 · Тренировка</span><h1>10 минут в день — и слова твои</h1><p>Выбери уровень и тему. Карточки работают по системе Лейтнера: слова, которые ты знаешь, уходят в дальние коробки и встречаются реже. Сложные остаются рядом и повторяются чаще.</p></div>
+  <div class="modes">${MODES.map(m => `<button type="button" class="card mode ${store.ui.mode === m.id ? 'on' : ''}" data-mode="${m.id}" style="--r:${m.r}"><span class="mi">${m.i}</span><b>${m.n}</b><span>${m.d}</span></button>`).join('')}</div>
+  <div class="cats" id="tcats" style="margin-bottom:16px"></div>
+  <div class="trainbox"><section class="card arena" id="arena"></section><aside class="card side" id="side"></aside></div>`;
+  paintTcats(); newSession(); paintSide();
+}
+function paintTcats() {
+  const el = $('#tcats'); if (!el) return;
+  if (store.ui.mode === 'tense') { el.innerHTML = ''; return; }
+  const c = store.ui.tcat;
+  const tt = store.ui.ttier || 0;
+  el.innerHTML = [[0, 'Любой уровень'], [1, 'База'], [2, 'Уверенно'], [3, 'Продвинуто']].map(([t, n]) => `<button class="chip ${tt === t ? 'on' : ''}" data-ttier="${t}" type="button">${n}</button>`).join('') + '<span style="width:12px;flex:none"></span>' + `<button class="chip ${c === 'all' ? 'on' : ''}" data-tcat="all" type="button">Все темы</button>` + CATS.filter(x => (store.ui.mode !== 'gap' || x.id !== 'phrases') && (x.id !== 'swear' || store.ui.adult)).map(x => `<button class="chip ${c === x.id ? 'on' : ''}" data-tcat="${x.id}" style="--r:${x.r}" type="button"><i class="dot"></i>${x.n}</button>`).join('');
+}
+function pickWords(n) {
+  let pool = WORDS.filter(w => (store.ui.tcat === 'all' || w.cat === store.ui.tcat) && (!store.ui.ttier || w.t === store.ui.ttier));
+  if (store.ui.mode === 'gap') pool = pool.filter(w => w.cat !== 'phrases' && gapify(w));
+  const fresh = pool.filter(w => box(w.k) < 5);
+  const src = fresh.length >= n ? fresh : pool;
+  return shuffle(src).sort((a, b) => box(a.k) - box(b.k)).slice(0, n * 2).sort(() => Math.random() - .5).slice(0, n);
+}
+function gapify(w) {
+  const low = w.ex.toLowerCase(), k = w.w.toLowerCase();
+  let i = low.indexOf(k);
+  if (i >= 0 && (i === 0 || !/[a-z]/.test(low[i - 1])) && !/[a-z]/.test(low[i + k.length] || '')) return [w.ex.slice(0, i), w.ex.slice(i, i + k.length), w.ex.slice(i + k.length)];
+  if (k.includes(' ')) return null;
+  const stem = k.replace(/(e|y)$/, '').slice(0, Math.max(4, k.length - 2));
+  const m = [...w.ex.matchAll(/[A-Za-z'-]+/g)].find(t => t[0].toLowerCase().startsWith(stem) && t[0].length <= k.length + 4);
+  return m ? [w.ex.slice(0, m.index), m[0], w.ex.slice(m.index + m[0].length)] : null;
+}
+function newSession() {
+  const mode = store.ui.mode;
+  let items;
+  if (mode === 'tense') { items = shuffle(T.flatMap(t => t.q.map(q => ({ t, q })))).slice(0, 10); }
+  else items = pickWords(10);
+  sess = { mode, items, i: 0, good: 0, flipped: false, answered: false };
+  paintArena();
+}
+function paintArena() {
+  const a = $('#arena'); if (!a) return;
+  const s = sess, n = s.items.length;
+  if (s.i >= n) {
+    a.innerHTML = `<div class="done"><span class="eyebrow">Сессия завершена</span><div class="score">${s.good}/${n}</div><p style="color:var(--muted);max-width:40ch">${s.good >= n * .8 ? 'Блестяще. Эти слова переехали в дальние коробки.' : s.good >= n * .5 ? 'Хорошо! Трудные слова вернутся завтра.' : 'Нормально для старта. Повторение сделает своё дело.'}</p><button class="btn c" data-again type="button">Ещё 10 ${I.arrow}</button></div>`;
+    if (s.good >= n * .6) { const [x, y] = centerOf(a); confetti(x, y - 60, 90); }
+    paintSide(); return;
+  }
+  const it = s.items[s.i];
+  const head = `<div class="prog"><div class="bar"><i style="width:${s.i / n * 100}%;--r:${MODES.find(m => m.id === s.mode).r}"></i></div><span>${s.i + 1} / ${n}</span></div>`;
+  if (s.mode === 'ru-en' || s.mode === 'en-ru') {
+    const c = CATBY[it.cat], ru = s.mode === 'ru-en';
+    a.innerHTML = head + `
+      <div class="flip ${s.flipped ? 'on' : ''}" id="flip" role="button" tabindex="0" aria-label="Перевернуть карточку" style="--r:${c.r}"><div class="flip-in">
+        <div class="face"><span class="eyebrow lbl">${c.n} · коробка ${box(it.k)} · ${tierName(it)}</span>${ru ? `<div class="ruw">${esc(it.ru)}</div><p style="color:var(--muted)">Как это по-испански? Скажи вслух, потом переверни.</p>` : `<div class="big">${esc(it.w)}</div><p style="color:var(--muted)">Что это значит? Вспомни и переверни.</p>`}</div>
+        <div class="face back"><span class="eyebrow lbl">Ответ</span><div class="big">${esc(it.w)}</div><div class="ruw" style="font-size:20px">${esc(it.ru)}</div><p class="exs">${esc(it.ex)}</p></div>
+      </div></div>
+      ${s.flipped ? `<div class="grade"><button class="g0" data-grade="0" type="button">Не вспомнил</button><button class="g1" data-grade="1" type="button">С трудом</button><button class="g2" data-grade="2" type="button">Знаю</button></div>` : `<button class="btn c" data-flip type="button" style="justify-content:center">Показать ответ</button>`}`;
+    if (s.flipped) speak(it.w);
+    return;
+  }
+  if (s.mode === 'gap') {
+    const g = gapify(it);
+    const opts = s.opts || (s.opts = shuffle([it, ...shuffle(WORDS.filter(w => w.cat === it.cat && w.k !== it.k)).slice(0, 3)]));
+    a.innerHTML = head + `<div class="mcq"><span class="eyebrow">Какое слово пропущено? Форма может меняться</span><p class="prompt"><span class="en">${esc(g[0])}<span class="gap" id="gapw">${s.answered ? esc(g[1]) : '&nbsp;?&nbsp;'}</span>${esc(g[2])}</span></p><p style="color:var(--muted)">Подсказка: ${esc(it.ru)}</p>
+      <div class="mopts">${opts.map(o => `<button type="button" class="qopt" data-pick="${encodeURIComponent(o.w)}"><span class="en">${esc(o.w)}</span></button>`).join('')}</div>${s.answered ? `<button class="btn c" data-next type="button">Дальше ${I.arrow}</button>` : ''}</div>`;
+    return;
+  }
+  const { t, q } = it;
+  const opts = s.opts || (s.opts = shuffle([q[1], q[2], q[3]]));
+  a.innerHTML = head + `<div class="mcq"><span class="eyebrow">Выбери правильную форму</span><p class="prompt"><span class="en">${esc(q[0]).replace('___', `<span class="gap" id="gapw">${s.answered ? esc(q[1]) : '&nbsp;?&nbsp;'}</span>`)}</span></p>
+    <div class="mopts">${opts.map(o => `<button type="button" class="qopt" data-pick="${encodeURIComponent(o)}">${esc(o)}</button>`).join('')}</div><p class="why" id="why"></p>${s.answered ? `<button class="btn c" data-next type="button">Дальше ${I.arrow}</button>` : ''}</div>`;
+}
+function grade(gv, btn) {
+  const it = sess.items[sess.i], b = box(it.k);
+  store.box[it.k] = gv === 2 ? Math.min(5, b + 1) : gv === 1 ? Math.max(1, b) : 1;
+  if (gv === 2) { sess.good++; const [x, y] = centerOf(btn); addXP(3, x, y - 20); }
+  else if (gv === 1) { sess.good += .5; addXP(1); }
+  save(); stats();
+  sess.i++; sess.flipped = false; sess.good = Math.round(sess.good * 2) / 2; paintArena(); paintSide();
+}
+function pick(btn) {
+  if (sess.answered) return;
+  const it = sess.items[sess.i], val = decodeURIComponent(btn.dataset.pick);
+  const right = sess.mode === 'gap' ? it.w : it.q[1];
+  sess.answered = true;
+  const ok = val === right;
+  $$('[data-pick]').forEach(b => { b.disabled = true; if (decodeURIComponent(b.dataset.pick) === right) b.classList.add('right'); });
+  if (!ok) btn.classList.add('no');
+  if (sess.mode === 'gap') { const g = gapify(it); $('#gapw').textContent = g[1]; store.box[it.k] = ok ? Math.min(5, box(it.k) + 1) : 1; speak(it.ex); }
+  else { $('#gapw').textContent = right; $('#why').textContent = it.q[4] + ' (' + it.t.n + ')'; $('#why').className = 'why ' + (ok ? 'good' : ''); speak(it.q[0].replace('___', right)); }
+  if (ok) { sess.good++; const [x, y] = centerOf(btn); addXP(sess.mode === 'gap' ? 3 : 5, x, y - 20); confetti(x, y, 24); }
+  save(); stats(); paintSide();
+  btn.closest('.mcq').insertAdjacentHTML('beforeend', `<button class="btn c" data-next type="button">Дальше ${I.arrow}</button>`);
+}
+function paintSide() {
+  const s = $('#side'); if (!s) return;
+  const cnt = [0, 0, 0, 0, 0, 0]; WORDS.forEach(w => cnt[box(w.k)]++);
+  const mx = Math.max(...cnt, 1);
+  const lbl = ['новые', '1', '2', '3', '4', '5'], cols = ['var(--c-a)', 'var(--c-v)', 'var(--c-p)', 'var(--c-q)', 'var(--c-o)', 'var(--ok)'];
+  s.innerHTML = `<span class="eyebrow">Коробки Лейтнера</span>
+    <div class="boxes">${cnt.map((c, i) => `<div><b>${c}</b><i style="height:${Math.max(3, c / mx * 100)}%;--r:${cols[i]}"></i><span>${lbl[i]}</span></div>`).join('')}</div>
+    <p style="font-size:14px;color:var(--muted)">«Знаю» — слово переходит в следующую коробку. «Не вспомнил» — обратно в первую. Выученным слово считается с 4-й коробки.</p>
+    <div class="tip">${I.bulb}<p>Говори ответ вслух до того, как перевернёшь карточку. Попытка вспомнить и укрепляет память, даже если ответ неверный.</p></div>`;
+}
+
+/* ═══════════ VIEW: GAMES ═══════════ */
+const GAMES = [
+  { id: 'speed', n: 'Спид-раунд', d: '60 секунд. Угадывай перевод подряд, чтобы разогнать комбо до ×5. Ошибка отнимает 3 секунды.', r: 'var(--c-v)', i: I.zap },
+  { id: 'pairs', n: 'Пары', d: 'Переворачивай карточки и находи 6 пар «слово — перевод». Чем меньше ходов, тем круче.', r: 'var(--c-o)', i: I.cards },
+];
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+function maskTitle(title, w) {
+  const low = title.toLowerCase();
+  if (w.includes(' ') || /[?.!]$/.test(w)) { const i = low.indexOf(w); return i >= 0 ? title.slice(0, i) + '_____' + title.slice(i + w.length) : null; }
+  const stem = w.slice(0, Math.max(3, w.length - 2)), re = /[A-Za-z']+/g; let m;
+  while ((m = re.exec(title))) if (m[0].toLowerCase().startsWith(stem)) return title.slice(0, m.index) + '_____' + title.slice(m.index + m[0].length);
+  return null;
+}
+const TRACKQ = WORDS.filter(w => w.song).map(w => ({ w, masked: maskTitle(w.song[0], w.w.toLowerCase()) })).filter(x => x.masked)
+  .filter((x, i, a) => a.findIndex(y => y.w.song[0] === x.w.song[0]) === i);
+let game = null;
+function viewGames(v) {
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Игры</span><h1>Играй — и слова застрянут в голове</h1><p>Быстрые игры на тех же словах из словаря. За каждую игру даются XP, а рекорды сохраняются в этом браузере.</p></div>
+  <div class="games">${GAMES.map(g => `<button type="button" class="card mode ${store.ui.game === g.id ? 'on' : ''}" data-game="${g.id}" style="--r:${g.r}"><span class="mi">${g.i}</span><b>${g.n}</b><span>${g.d}</span></button>`).join('')}</div>
+  <section class="card garena" id="garena"></section>`;
+  gameIntro(store.ui.game || 'speed');
+}
+function gameIntro(id) {
+  store.ui.game = id; save(); clearTimers(); game = null;
+  $$('[data-game]').forEach(b => b.classList.toggle('on', b.dataset.game === id));
+  const g = GAMES.find(x => x.id === id), best = store.best[id];
+  const bestTxt = id === 'pairs' ? (best ? `Рекорд: ${best} ходов` : 'Рекорда пока нет') : (best ? `Рекорд: ${best}${id === 'tracks' ? ' из 10' : ' очков'}` : 'Рекорда пока нет');
+  $('#garena').innerHTML = `<div class="gintro" style="--r:${g.r}"><span class="mi" style="width:64px;height:64px;border-radius:18px">${g.i.replace('<svg', '<svg width="34" height="34"')}</span><h2 style="font-size:32px">${g.n}</h2><p style="color:var(--muted);max-width:44ch">${g.d}</p><span class="best">${bestTxt}</span><button class="btn c" data-play type="button" style="background:${g.r}">Играть ${I.arrow}</button></div>`;
+}
+function gameStart() {
+  const id = store.ui.game; clearTimers();
+  if (id === 'speed') { game = { id, score: 0, combo: 1, left: 60, right: 0, lock: false }; speedNext(); const t = setInterval(() => { if (!game || game.id !== 'speed') return clearInterval(t); game.left = Math.max(0, game.left - .1); paintRing(); if (game.left <= 0) { clearInterval(t); speedEnd(); } }, 100); timers.push(t); }
+  if (id === 'pairs') { const ws = shuffle(WORDS.filter(w => w.cat !== 'phrases' && w.cat !== 'swear' && w.t <= 2 && w.w.length <= 14 && w.ru.length <= 28)).slice(0, 6); game = { id, cards: shuffle(ws.flatMap(w => [{ k: w.k, txt: w.w, en: 1 }, { k: w.k, txt: w.ru.split(/[;(]/)[0].trim(), en: 0 }])), open: [], done: new Set(), moves: 0, lock: false, t0: Date.now() }; paintPairs(); }
+  if (id === 'tracks') { game = { id, qs: shuffle(TRACKQ).slice(0, 10), i: 0, good: 0, answered: false }; paintTrack(); }
+}
+const C64 = 2 * Math.PI * 28;
+function paintRing() { const a = $('#ringArc'), n = $('#ringN'); if (!a) return; a.style.strokeDashoffset = C64 * (1 - game.left / 60); a.style.stroke = game.left < 10 ? 'var(--bad)' : 'var(--c-v)'; n.textContent = Math.ceil(game.left); }
+function speedNext() {
+  const pool = WORDS.filter(w => w.cat !== 'phrases' && w.cat !== 'swear' && w.t <= 2);
+  const w = rnd(pool); const opts = shuffle([w, ...shuffle(WORDS.filter(x => x.cat === w.cat && x.ru !== w.ru && x.k !== w.k)).slice(0, 3)]);
+  game.q = { w, opts }; game.lock = false;
+  $('#garena').innerHTML = `<div class="gtop"><div class="ring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--line)" stroke-width="6"/><circle id="ringArc" cx="32" cy="32" r="28" fill="none" stroke="var(--c-v)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C64}" stroke-dashoffset="${C64 * (1 - game.left / 60)}"/></svg><span id="ringN">${Math.ceil(game.left)}</span></div><div class="score"><b>${game.score}</b><span>очков</span></div><span class="combo" id="combo">×${game.combo}</span></div>
+    <div class="gword pop">${esc(w.w)}${icoSay(w.w)}</div>
+    <div class="mopts">${opts.map((o, i) => `<button type="button" class="qopt" data-sp="${encodeURIComponent(o.k)}"><b style="font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-right:8px">${i + 1}</b>${esc(o.ru)}</button>`).join('')}</div>`;
+}
+function speedPick(btn) {
+  if (!game || game.lock) return; game.lock = true;
+  const k = decodeURIComponent(btn.dataset.sp), ok = k === game.q.w.k;
+  if (ok) { game.score += 10 * game.combo; game.combo = Math.min(5, game.combo + 1); game.right++; btn.classList.add('right'); const [x, y] = centerOf(btn); confetti(x, y, 12 + game.combo * 4); setTimeout(() => game && game.id === 'speed' && game.left > 0 && speedNext(), 260); }
+  else { game.combo = 1; game.left = Math.max(0, game.left - 3); btn.classList.add('no'); $$('[data-sp]').forEach(b => { if (decodeURIComponent(b.dataset.sp) === game.q.w.k) b.classList.add('right'); }); setTimeout(() => game && game.id === 'speed' && game.left > 0 && speedNext(), 750); }
+}
+function speedEnd() {
+  const sc = game.score, rec = sc > (store.best.speed || 0); if (rec) store.best.speed = sc; save();
+  addXP(Math.max(2, Math.round(sc / 20)));
+  $('#garena').innerHTML = `<div class="done"><span class="eyebrow">Время вышло</span><div class="score"><b style="font-size:64px">${sc}</b><span>очков · ${game.right} верных ответов</span></div><p style="color:var(--muted)">${rec ? 'Новый рекорд!' : 'Рекорд: ' + (store.best.speed || 0)}</p><button class="btn c" data-play type="button">Ещё раунд ${I.arrow}</button></div>`;
+  if (rec || sc > 150) { const [x, y] = centerOf($('#garena')); confetti(x, y - 40, 120); }
+  game = null;
+}
+function paintPairs() {
+  const g = game;
+  $('#garena').innerHTML = `<div class="gtop"><div class="score"><b>${g.moves}</b><span>ходов</span></div><div class="score"><b>${g.done.size}/6</b><span>пар найдено</span></div><button class="btn ghost sm" data-play type="button">${I.undo}Заново</button></div>
+    <div class="pairs">${g.cards.map((c, i) => `<button type="button" class="pc ${g.open.includes(i) ? 'on' : ''} ${g.done.has(c.k) ? 'ok' : ''}" data-pc="${i}" aria-label="Карточка ${i + 1}"><span class="pc-in"><span class="pc-f"></span><span class="pc-b ${c.en ? 'en' : ''}">${esc(c.txt)}</span></span></button>`).join('')}</div>`;
+}
+function pairPick(i) {
+  const g = game; if (!g || g.lock || g.open.includes(i) || g.done.has(g.cards[i].k)) return;
+  g.open.push(i);
+  if (g.cards[i].en) speak(g.cards[i].txt);
+  if (g.open.length === 2) {
+    g.moves++;
+    const [a, b] = g.open;
+    if (g.cards[a].k === g.cards[b].k) {
+      g.done.add(g.cards[a].k); g.open = []; paintPairs();
+      const el = $(`[data-pc="${b}"]`); if (el) { const [x, y] = centerOf(el); confetti(x, y, 20); }
+      if (g.done.size === 6) setTimeout(pairsWin, 500);
+      return;
+    }
+    g.lock = true; paintPairs();
+    setTimeout(() => { if (game === g) { g.open = []; g.lock = false; paintPairs(); } }, 850);
+    return;
+  }
+  paintPairs();
+}
+function pairsWin() {
+  const g = game, rec = !store.best.pairs || g.moves < store.best.pairs; if (rec) store.best.pairs = g.moves; save(); addXP(15);
+  const sec = Math.round((Date.now() - g.t0) / 1000);
+  $('#garena').innerHTML = `<div class="done"><span class="eyebrow">Все пары найдены</span><div class="score"><b style="font-size:64px">${g.moves}</b><span>ходов · ${sec} сек</span></div><p style="color:var(--muted)">${rec ? 'Новый рекорд!' : 'Рекорд: ' + store.best.pairs + ' ходов'} · +15 XP</p><button class="btn c" data-play type="button">Ещё раз ${I.arrow}</button></div>`;
+  const [x, y] = centerOf($('#garena')); confetti(x, y - 40, 120); game = null;
+}
+function paintTrack() {
+  const g = game;
+  if (g.i >= g.qs.length) {
+    const rec = g.good > (store.best.tracks || 0); if (rec) store.best.tracks = g.good; save(); addXP(g.good * 2);
+    $('#garena').innerHTML = `<div class="done"><span class="eyebrow">Плейлист пройден</span><div class="score"><b style="font-size:64px">${g.good}/10</b><span>треков угадано</span></div><p style="color:var(--muted)">${rec ? 'Новый рекорд!' : 'Рекорд: ' + (store.best.tracks || 0) + ' из 10'} · +${g.good * 2} XP</p><button class="btn c" data-play type="button">Новый плейлист ${I.arrow}</button></div>`;
+    if (g.good >= 7) { const [x, y] = centerOf($('#garena')); confetti(x, y - 40, 120); }
+    game = null; return;
+  }
+  const q = g.qs[g.i];
+  g.opts = g.opts || shuffle([q.w, ...shuffle(TRACKQ.filter(x => x.w.k !== q.w.k).map(x => x.w)).slice(0, 3)]);
+  $('#garena').innerHTML = `<div class="prog"><div class="bar"><i style="width:${g.i * 10}%;--r:var(--c-t)"></i></div><span>${g.i + 1} / 10</span></div>
+    <div class="trk"><span class="disc"></span><span class="eyebrow">Какое слово пропущено в названии?</span><div class="tt">«${g.answered ? esc(q.w.song[0]) : esc(q.masked).replace('_____', '<span class="gap">&nbsp;?&nbsp;</span>')}»</div><div class="ar">${esc(q.w.song[1])}</div></div>
+    <div class="mopts">${g.opts.map(o => `<button type="button" class="qopt ${g.answered && o.k === q.w.k ? 'right' : ''}" data-tr="${encodeURIComponent(o.k)}" ${g.answered ? 'disabled' : ''}><span class="en">${esc(o.w)}</span> <span style="color:var(--muted);font-size:13px">· ${esc(o.ru)}</span></button>`).join('')}</div>
+    ${g.answered ? `<p class="why good">Слово «${esc(q.w.w)}» — ${esc(q.w.ru)}. Пример: <span class="en" style="font-size:17px">${esc(q.w.ex)}</span></p><button class="btn c" data-tnext type="button">Дальше ${I.arrow}</button>` : '<p class="why">Слово в названии может стоять в другой форме: Believer → believe.</p>'}`;
+}
+function trackPick(btn) {
+  const g = game; if (!g || g.answered) return;
+  const k = decodeURIComponent(btn.dataset.tr), q = g.qs[g.i], ok = k === q.w.k;
+  g.answered = true; if (ok) { g.good++; const [x, y] = centerOf(btn); confetti(x, y, 30); } else btn.classList.add('no');
+  const wrongEl = ok ? null : k; paintTrack();
+  if (wrongEl) { const b = $(`[data-tr="${encodeURIComponent(wrongEl)}"]`); if (b) b.classList.add('no'); }
+  speak(q.w.song[0]);
+}
+
+const exBlock = w => `<p class="exs">${esc(w.ex)}</p>${w.exru ? `<p class="exru">${esc(w.exru)}</p>` : ''}${w.ex2 ? `<div class="chatx"><span class="lbl2">в живой речи</span><p class="exs">${esc(w.ex2)}</p>${w.ex2ru ? `<p class="exru">${esc(w.ex2ru)}</p>` : ''}</div>` : ''}`;
+
+/* ═══════════ VIEW: TALK (chat dialogues) ═══════════ */
+const DIALOGS = [{"t": "Planes para la noche", "s": "Чат с подругой", "me": "Álex", "other": "Marta", "c": "var(--c-s)", "l": [["Álex", "Oye, ¿qué haces esta noche? ¿[[Quedamos|встретимся]]?", "Слушай, что делаешь сегодня вечером? Встретимся?"], ["Marta", "[[Vale|ок]], ¿qué te apetece? ¿Algo [[tranquilo|спокойное]]?", "Ок, чего хочется? Что-нибудь спокойное?"], ["Álex", "Sí, pizza y peli en mi casa. Nada [[del otro mundo|ничего особенного]].", "Да, пицца и фильм у меня. Ничего особенного."], ["Marta", "Me [[mola|нравится]] el plan. Llevo yo las bebidas.", "Мне нравится план. Напитки принесу я."], ["Álex", "Eres la mejor, [[tía|подруга]].", "Ты лучшая, подруга."], ["Marta", "Lo sé. ¿A qué hora? Hoy ando [[liada|замотана]].", "Знаю. Во сколько? Сегодня я замотана."], ["Álex", "A las nueve. ¿Te viene [[bien|удобно]]?", "В девять. Тебе удобно?"], ["Marta", "Perfecto. [[Nos vemos|увидимся]] luego. ¡Un beso!", "Отлично. Увидимся. Целую!"]]}, {"t": "En el restaurante", "s": "Заказ в ресторане", "me": "Tú", "other": "Camarero", "c": "var(--c-p)", "l": [["Camarero", "¡Buenas noches! ¿Mesa para cuántas personas?", "Добрый вечер! Столик на сколько человек?"], ["Tú", "Para dos, por favor. ¿Tienen una mesa [[cerca de la ventana|у окна]]?", "На двоих, пожалуйста. Есть столик у окна?"], ["Camarero", "Claro, [[síganme|идите за мной]]. Aquí tienen la carta.", "Конечно, идите за мной. Вот меню."], ["Tú", "Gracias. Para mí la paella, y para beber, [[agua con gas|вода с газом]].", "Спасибо. Мне паэлью, а пить — воду с газом."], ["Camarero", "Muy bien. ¿Y de [[postre|десерт]]?", "Отлично. А на десерт?"], ["Tú", "Luego vemos. ¿Me trae la cuenta [[más tarde|позже]]?", "Потом посмотрим. Принесёте счёт позже?"], ["Camarero", "Por supuesto. [[¡Buen provecho!|приятного аппетита]]", "Конечно. Приятного аппетита!"], ["Tú", "Gracias, [[igualmente|и вам того же]].", "Спасибо, и вам того же."]]}, {"t": "Conociendo gente", "s": "Знакомство на вечеринке", "me": "Tú", "other": "Lucas", "c": "var(--c-o)", "l": [["Lucas", "¡Hola! ¿Eres amigo de Carla? [[Mucho gusto|очень приятно]], soy Lucas.", "Привет! Ты друг Карлы? Очень приятно, я Лукас."], ["Tú", "Encantado. Me llamo Alex. ¿De dónde eres?", "Очень приятно. Меня зовут Алекс. Откуда ты?"], ["Lucas", "Soy de México, pero vivo aquí desde hace dos años. ¿Y tú?", "Я из Мексики, но живу здесь два года. А ты?"], ["Tú", "Yo soy ruso. Hablo [[un poco|немного]] de español, pero estoy aprendiendo.", "Я русский. Немного говорю по-испански, но учусь."], ["Lucas", "¡[[Qué padre|как круто (Мекс.)]]! Hablas muy bien, [[neta|правда (Мекс.)]].", "Как круто! Ты очень хорошо говоришь, правда."], ["Tú", "Gracias, eres muy amable. ¿A qué te dedicas?", "Спасибо, ты очень любезен. Чем занимаешься?"], ["Lucas", "Soy diseñador. [[Chambeo|работаю (Мекс.)]] desde casa casi siempre.", "Я дизайнер. Почти всегда работаю из дома."], ["Tú", "[[Qué bien|как здорово]]. Bueno, un placer. ¡Nos vemos!", "Как здорово. Что ж, было приятно. Увидимся!"]]}, {"t": "Llego tarde al trabajo", "s": "Сообщение начальнице", "me": "Tú", "other": "Jefa", "c": "var(--c-q)", "l": [["Tú", "Buenos días. Perdona, hoy [[llego tarde|опоздаю]]. Hay [[mogollón|куча (Исп.)]] de tráfico.", "Доброе утро. Прости, сегодня опоздаю. Огромные пробки."], ["Jefa", "No pasa nada. ¿Cuánto tardarás?", "Ничего страшного. Сколько тебе понадобится?"], ["Tú", "Unos veinte minutos. Voy a llegar lo antes posible.", "Минут двадцать. Постараюсь приехать как можно скорее."], ["Jefa", "[[Vale|хорошо]]. La reunión es a las diez, así que [[avísame|предупреди меня]] si hay algún problema.", "Хорошо. Совещание в десять, так что предупреди, если что-то случится."], ["Tú", "Claro. Si hace falta, me conecto desde el coche.", "Конечно. Если надо, подключусь из машины."], ["Jefa", "[[Ojo|осторожно]], no mires el móvil conduciendo.", "Осторожно, не смотри в телефон за рулём."], ["Tú", "Tranquila, uso el manos libres. [[Voy para allá|уже еду]].", "Не волнуйся, у меня гарнитура. Уже еду."], ["Jefa", "Gracias por avisar. [[Hasta ahora|до скорого]].", "Спасибо, что предупредил. До скорого."]]}, {"t": "Primera cita", "s": "Свидание и красные флаги", "me": "Tú", "other": "Sofía", "c": "var(--c-x)", "l": [["Sofía", "Entonces, ¿qué tal la cita de ayer? ¡Cuéntame!", "Ну что, как вчерашнее свидание? Рассказывай!"], ["Tú", "Pues, [[regular|так себе]]. Estuvo todo el rato con el móvil.", "Так себе. Он всё время сидел в телефоне."], ["Sofía", "Uf, eso es una [[bandera roja|красный флаг]].", "Уф, это красный флаг."], ["Tú", "Y encima habló de su ex. Me dio [[mal rollo|напряг, плохое чувство]].", "И ещё говорил о бывшей. Мне стало не по себе."], ["Sofía", "[[Qué fuerte|жесть]]. Pero no desaparezcas sin decir nada, dile la verdad.", "Жесть. Но не пропадай без объяснений, скажи правду."], ["Tú", "Tienes razón. Le voy a escribir esta noche.", "Ты права. Напишу ему вечером."], ["Sofía", "Así me gusta. [[Ánimo|держись]].", "Вот так мне нравится. Держись."], ["Tú", "Gracias, [[bonita|красотка]]. Eres un amor.", "Спасибо, красотка. Ты прелесть."]]}, {"t": "Perdido en la calle", "s": "Спрашиваем дорогу", "me": "Tú", "other": "Pablo", "c": "var(--c-t)", "l": [["Tú", "Perdona, ¿me puedes ayudar? Estoy [[perdido|потерялся]].", "Простите, вы можете помочь? Я потерялся."], ["Pablo", "Claro. ¿Adónde vas?", "Конечно. Куда вам нужно?"], ["Tú", "Busco la estación de metro. ¿Está [[lejos|далеко]]?", "Я ищу станцию метро. Она далеко?"], ["Pablo", "No, está [[a cinco minutos|в пяти минутах]]. Sigue todo [[recto|прямо]] y gira a la derecha.", "Нет, в пяти минутах. Иди прямо и поверни направо."], ["Tú", "Todo recto y derecha. [[Entendido|понял]]. ¿Y después?", "Прямо и направо. Понял. А потом?"], ["Pablo", "Después ves un [[cartel|вывеска]] azul. Es allí.", "Потом увидишь синюю вывеску. Это там."], ["Tú", "Muchas gracias, [[de verdad|правда]]. Eres muy amable.", "Большое спасибо, правда. Вы очень любезны."], ["Pablo", "[[De nada|не за что]]. ¡Que tengas buen día!", "Не за что. Хорошего дня!"]]}];
+const AVC = ['#4D5BFF', '#FF5A47', '#0FA98F', '#F29D0C', '#9A55F5', '#EE3E93', '#1694E8'];
+const avc = n => AVC[[...n].reduce((a, c) => a + c.charCodeAt(0), 0) % AVC.length];
+const termize = t => esc(t).replace(/\[\[(.+?)\|(.+?)\]\]/g, (m, a, b) => `<button type="button" class="term" data-term="${encodeURIComponent(a)}" data-tip="${b}">${a}</button>`);
+const plainT = t => t.replace(/\[\[(.+?)\|.+?\]\]/g, '$1');
+function viewTalk(v) {
+  const REG = [['Формально', 'Quisiera marcharme ahora.', 'var(--c-s)'], ['Нейтрально', 'Quiero irme.', 'var(--c-o)'], ['Разговорно', 'Me voy ya.', 'var(--c-p)'], ['Сленг', 'Me piro.', 'var(--c-x)']];
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Шаг 5 · Живая речь</span><h1>Как говорят в чатах и на улице</h1><p>Учебники учат «Quisiera marcharme», а друзья говорят «Me piro». Читай переписки, нажимай на подчёркнутые слова, чтобы узнать их смысл и услышать произношение. Нажми на сообщение, чтобы озвучить его целиком.</p></div>
+  <div class="ladder">${REG.map(([n, ex, c]) => `<div class="rg" style="--r:${c}"><b>${n}</b><span>${esc(ex)}</span></div>`).join('')}<a class="rg" href="#words" data-swear style="--r:var(--bad)"><b>18+</b><span>маты — в разделе «Слова»</span></a></div>
+  <div class="talk"><div class="scenes" id="scenes"></div><div class="phone" id="phone"></div></div>`;
+  playDialog(Math.min(store.ui.dlg || 0, DIALOGS.length - 1));
+}
+function paintScenes() {
+  const cur = store.ui.dlg || 0;
+  $('#scenes').innerHTML = DIALOGS.map((d, k) => `<button type="button" class="${k === cur ? 'on' : ''} ${store.done['d' + k] ? 'done' : ''}" data-dlg="${k}" style="--r:${d.c}"><span class="n">${store.done['d' + k] ? I.check.replace('<svg', '<svg width="16" height="16"') : k + 1}</span><span><strong>${esc(d.t)}</strong><small>${esc(d.s)}</small></span></button>`).join('');
+}
+function playDialog(i) {
+  clearTimers(); store.ui.dlg = i; save(); paintScenes();
+  const d = DIALOGS[i], ph = $('#phone'), noTr = store.ui.tr === false;
+  ph.innerHTML = `<div class="ph-top"><span class="av" style="--ac:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.6)">${esc(d.other[0])}</span><div><b>${esc(d.other)}</b><small>${esc(d.s)} · онлайн</small></div></div><div class="msgs ${noTr ? 'notr' : ''}" id="msgs" aria-live="polite"></div><div class="ph-bar"><button class="btn sm ghost" data-dreplay type="button">${I.undo}Заново</button><button class="btn sm ghost" data-dtr type="button">Перевод: ${noTr ? 'выкл' : 'вкл'}</button><button class="btn sm ghost" data-dsayall type="button">${I.sound}Озвучить</button><button class="btn sm c" data-dnext type="button">Дальше ${I.arrow}</button></div>`;
+  const box = $('#msgs'); let k = 0;
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const step = () => {
+    if (k >= d.l.length) { if (!store.done['d' + i]) { store.done['d' + i] = 1; save(); addXP(5); const [x, y] = centerOf(ph); confetti(x, y - 80, 60); paintScenes(); } return; }
+    const [who, en, ru] = d.l[k], me = who === d.me;
+    const row = document.createElement('div'); row.className = 'msg' + (me ? ' me' : '');
+    const av = `<span class="av" style="--ac:${avc(who)}">${esc(who[0])}</span>`;
+    row.innerHTML = av + '<span class="typing"><i></i><i></i><i></i></span>';
+    box.appendChild(row); box.scrollTop = box.scrollHeight;
+    later(() => {
+      row.innerHTML = av + `<div class="bub" role="button" tabindex="0" data-say="${encodeURIComponent(plainT(en))}">${termize(en)}<span class="ru">${esc(ru)}</span></div>`;
+      box.scrollTop = box.scrollHeight; k++; later(step, RM ? 0 : 600);
+    }, RM ? 0 : 700 + Math.min(en.length * 12, 650));
+  };
+  step();
+}
+
+/* ═══════════ VIEW: CHAT TRAINER (endless) ═══════════ */
+const CT = [{"tag": "Presente", "bot": "¿Qué haces después del trabajo?", "botRu": "Что ты делаешь после работы?", "ru": "Я обычно {a}.", "ans": "Normalmente {a}.", "slots": {"a": [["veo la tele", "смотрю телевизор"], ["voy al gimnasio", "хожу в зал"], ["cocino", "готовлю"], ["llamo a mis amigos", "звоню друзьям"]]}, "tip": "Нормально начать с Normalmente: «я» показывает сам глагол."}, {"tag": "Ser", "bot": "¿De dónde eres?", "botRu": "Откуда ты?", "ru": "Я из {a}.", "ans": "Soy de {a}.", "slots": {"a": [["Rusia", "России"], ["Madrid", "Мадрида"], ["México", "Мексики"], ["Argentina", "Аргентины"]]}, "tip": "Soy de… — откуда ты (ser)."}, {"tag": "Estar", "bot": "¿Cómo estás hoy?", "botRu": "Как ты сегодня?", "ru": "Я {a}.", "ans": "Estoy {a}.", "slots": {"a": [["cansado", "устал"], ["muy bien", "очень хорошо"], ["un poco triste", "немного грустный"], ["contento", "доволен"]]}, "tip": "Состояние: estar."}, {"tag": "Вопрос", "bot": "Hola, soy nuevo aquí.", "botRu": "Привет, я тут новенький.", "ru": "Спроси: «Как тебя зовут?»", "ans": "¿Cómo te llamas?", "slots": {}, "tip": "Вопросительное слово с ударением + глагол."}, {"tag": "Вопрос", "bot": "Hola, ¿qué tal?", "botRu": "Привет, как дела?", "ru": "Спроси: «Где ты живёшь?»", "ans": "¿Dónde vives?", "slots": {}, "tip": "dónde — где, глагол стоит сразу за ним."}, {"tag": "Отрицание", "bot": "¿Hablas inglés?", "botRu": "Ты говоришь по-английски?", "ru": "Скажи: «Нет, я не говорю по-английски».", "ans": "No, no hablo inglés.", "slots": {}, "tip": "no ставится перед глаголом."}, {"tag": "Двойное отрицание", "bot": "¿Qué ves?", "botRu": "Что ты видишь?", "ru": "Скажи: «Я ничего не вижу».", "ans": "No veo nada.", "slots": {}, "tip": "Двойное отрицание в испанском нормально."}, {"tag": "Gustar", "bot": "¿Te gusta el café?", "botRu": "Тебе нравится кофе?", "ru": "Скажи: «Да, мне очень нравится кофе».", "ans": "Sí, me gusta mucho el café.", "slots": {}, "tip": "me gusta + единственное число."}, {"tag": "Gustar, мн. число", "bot": "¿Qué animales te gustan?", "botRu": "Какие животные тебе нравятся?", "ru": "Мне нравятся {a}.", "ans": "Me gustan {a}.", "slots": {"a": [["los perros", "собаки"], ["los gatos", "кошки"], ["los caballos", "лошади"]]}, "tip": "Нравятся несколько → gustan."}, {"tag": "Ir a", "bot": "¿Qué vas a hacer mañana?", "botRu": "Что ты будешь делать завтра?", "ru": "Я собираюсь {a}.", "ans": "Voy a {a}.", "slots": {"a": [["trabajar", "работать"], ["descansar", "отдыхать"], ["ver una película", "посмотреть фильм"], ["viajar", "поехать"]]}, "tip": "ir a + инфинитив."}, {"tag": "Querer", "bot": "¿Qué quieres tomar?", "botRu": "Что ты хочешь выпить?", "ru": "Я хочу {a}.", "ans": "Quiero {a}.", "slots": {"a": [["un café", "кофе"], ["una cerveza", "пиво"], ["agua", "воды"], ["un té", "чай"]]}, "tip": "quiero — я хочу."}, {"tag": "Tener que", "bot": "¿Por qué te vas ya?", "botRu": "Почему ты уже уходишь?", "ru": "Мне нужно {a}.", "ans": "Tengo que {a}.", "slots": {"a": [["trabajar", "работать"], ["estudiar", "заниматься"], ["recoger a mi hermana", "забрать сестру"]]}, "tip": "tener que + инфинитив."}, {"tag": "Poder", "bot": "Hace calor aquí.", "botRu": "Здесь жарко.", "ru": "Спроси: «Можно открыть окно?»", "ans": "¿Puedo abrir la ventana?", "slots": {}, "tip": "poder + инфинитив."}, {"tag": "Pretérito indefinido", "bot": "¿Qué hiciste ayer?", "botRu": "Что ты делал вчера?", "ru": "Вчера я {a}.", "ans": "Ayer {a}.", "slots": {"a": [["fui al cine", "ходил в кино"], ["comí con mis amigos", "обедал с друзьями"], ["trabajé mucho", "много работал"], ["vi una serie", "смотрел сериал"]]}, "tip": "Indefinido: завершённое действие."}, {"tag": "Pretérito perfecto", "bot": "¿Ya has comido?", "botRu": "Ты уже поел?", "ru": "Скажи: «Да, я уже поел».", "ans": "Sí, ya he comido.", "slots": {}, "tip": "he + причастие на -ido."}, {"tag": "Imperfecto", "bot": "¿Dónde vivías de niño?", "botRu": "Где ты жил в детстве?", "ru": "В детстве я жил {a}.", "ans": "De niño vivía {a}.", "slots": {"a": [["en un pueblo", "в городке"], ["con mis abuelos", "с бабушкой и дедушкой"], ["en la capital", "в столице"]]}, "tip": "Imperfecto: привычка и фон в прошлом."}, {"tag": "Futuro", "bot": "¿Crees que lloverá?", "botRu": "Думаешь, будет дождь?", "ru": "Скажи: «Нет, будет солнце».", "ans": "No, hará sol.", "slots": {}, "tip": "hará — будущее от hacer."}, {"tag": "Condicional", "bot": "¿Quieres algo?", "botRu": "Хочешь что-нибудь?", "ru": "Скажи: «Я бы хотел кофе».", "ans": "Me gustaría un café.", "slots": {}, "tip": "Me gustaría — вежливое «я бы хотел»."}, {"tag": "Вежливость", "bot": "Buenas tardes, ¿en qué puedo ayudarle?", "botRu": "Добрый день, чем могу помочь?", "ru": "Скажи: «Мне нужна помощь».", "ans": "Necesito ayuda.", "slots": {}, "tip": "necesitar — нуждаться."}, {"tag": "Дорога", "bot": "Hola, ¿necesitas algo?", "botRu": "Привет, тебе что-то нужно?", "ru": "Спроси: «Где находится вокзал?»", "ans": "¿Dónde está la estación?", "slots": {}, "tip": "Местоположение: estar."}, {"tag": "Цена", "bot": "Son diez euros.", "botRu": "С вас десять евро.", "ru": "Спроси: «Сколько это стоит?»", "ans": "¿Cuánto cuesta esto?", "slots": {}, "tip": "cuánto cuesta — сколько стоит."}, {"tag": "Время", "bot": "¿A qué hora empieza la película?", "botRu": "Во сколько начинается фильм?", "ru": "Она начинается в {a}.", "ans": "Empieza a las {a}.", "slots": {"a": [["siete", "семь"], ["ocho", "восемь"], ["nueve", "девять"]]}, "tip": "a las + час."}, {"tag": "Разговорка", "bot": "Oye, ¿quedamos esta noche?", "botRu": "Слушай, встретимся сегодня вечером?", "ru": "Скажи: «Ок, я за!»", "ans": "¡Vale, me apunto!", "slots": {}, "tip": "me apunto — «я в деле»."}, {"tag": "Ser", "bot": "¿Cómo es tu hermano?", "botRu": "Какой твой брат?", "ru": "Он очень {a}.", "ans": "Es muy {a}.", "slots": {"a": [["simpático", "приятный"], ["alto", "высокий"], ["divertido", "весёлый"], ["listo", "сообразительный"]]}, "tip": "ser — характер и внешность."}, {"tag": "Estar", "bot": "¿Dónde está tu móvil?", "botRu": "Где твой телефон?", "ru": "Он {a}.", "ans": "Está {a}.", "slots": {"a": [["en la mesa", "на столе"], ["en mi bolso", "в моей сумке"], ["en el coche", "в машине"]]}, "tip": "estar — местоположение."}, {"tag": "Прилагательное", "bot": "¿Cómo es tu casa?", "botRu": "Какой у тебя дом?", "ru": "У меня {a}.", "ans": "Tengo {a}.", "slots": {"a": [["una casa grande", "большой дом"], ["un piso pequeño", "маленькая квартира"], ["una casa vieja", "старый дом"]]}, "tip": "Прилагательное стоит после существительного."}, {"tag": "Возвратные", "bot": "¿A qué hora te levantas?", "botRu": "Во сколько ты встаёшь?", "ru": "Я встаю в {a}.", "ans": "Me levanto a las {a}.", "slots": {"a": [["siete", "семь"], ["seis", "шесть"], ["ocho", "восемь"]]}, "tip": "me levanto — возвратный глагол."}, {"tag": "Просьба", "bot": "Perdona, ¿necesitas algo?", "botRu": "Прости, тебе что-то нужно?", "ru": "Скажи: «Счёт, пожалуйста».", "ans": "La cuenta, por favor.", "slots": {}, "tip": "por favor — всегда вежливо."}, {"tag": "Мнение", "bot": "¿Qué te parece la ciudad?", "botRu": "Как тебе город?", "ru": "Скажи: «Мне очень нравится».", "ans": "Me gusta mucho.", "slots": {}, "tip": "Me gusta mucho — мне очень нравится."}, {"tag": "Поздравление", "bot": "Mañana es mi cumpleaños.", "botRu": "Завтра мой день рождения.", "ru": "Скажи: «С днём рождения! Желаю тебе всего лучшего».", "ans": "¡Feliz cumpleaños! Te deseo lo mejor.", "slots": {}, "tip": "Te deseo lo mejor — желаю тебе всего лучшего."}];
+const CFIX = [["Yo soy cansado.", "Yo estoy cansado.", "Yo tengo cansado.", "Yo es cansado.", "Состояние: estar, а не ser."], ["Mi hermana es en casa.", "Mi hermana está en casa.", "Mi hermana ser en casa.", "Mi hermana está de casa.", "Местоположение: estar."], ["Yo hablo no español.", "No hablo español.", "Hablo no español.", "No yo hablo español.", "no ставится прямо перед глаголом."], ["Me gusta los perros.", "Me gustan los perros.", "Me gustas los perros.", "Les gusta los perros.", "Нравятся несколько → gustan."], ["Yo tengo 25 años viejo.", "Tengo 25 años.", "Soy 25 años.", "Tengo 25 años viejo.", "Возраст: tener + años."], ["Un casa grande.", "Una casa grande.", "Uno casa grande.", "Una grande casa.", "casa — женский род: una."], ["Ellos es amigos.", "Ellos son amigos.", "Ellos están amigos.", "Ellos somos amigos.", "ellos → son."], ["Vivo en Madrid desde dos años.", "Vivo en Madrid desde hace dos años.", "Vivo en Madrid hace dos años.", "Vivo en Madrid desde dos años atrás.", "desde hace + период времени."], ["Ayer voy al cine.", "Ayer fui al cine.", "Ayer iba al cine.", "Ayer voy a el cine.", "ayer → прошедшее: fui."], ["Tengo hambre mucho.", "Tengo mucha hambre.", "Tengo muy hambre.", "Estoy mucho hambre.", "hambre — женский род: mucha hambre."], ["Me llamo es Ana.", "Me llamo Ana.", "Me llamo ser Ana.", "Mi llamo Ana.", "Me llamo + имя, без es."], ["Yo gusto el café.", "Me gusta el café.", "Yo gusta el café.", "Gusto el café.", "gustar: кому + gusta."], ["Quiero que voy.", "Quiero ir.", "Quiero que yo ir.", "Quiero voy.", "Если подлежащее одно, после querer идёт инфинитив."], ["Ella tiene un perro bonita.", "Ella tiene un perro bonito.", "Ella tiene una perro bonito.", "Ella tiene un perro bonitos.", "Прилагательное согласуется: perro → bonito."], ["Los libros es interesantes.", "Los libros son interesantes.", "Los libros están interesantes.", "Los libro son interesantes.", "Множественное число → son."], ["¿Cuando llegas?", "¿Cuándo llegas?", "¿Cuanto llegas?", "¿Cuándo llegar?", "Вопросительные слова пишутся с ударением."], ["Voy a el trabajo.", "Voy al trabajo.", "Voy en trabajo.", "Voy a trabajo.", "a + el = al."], ["No tengo ningún problemas.", "No tengo ningún problema.", "No tengo ningunos problemas.", "No tengo nada problemas.", "ningún — единственное число."], ["Ayer yo como pizza.", "Ayer comí pizza.", "Ayer como pizza.", "Ayer comiendo pizza.", "ayer → indefinido: comí."]];
+const REACT = ['¡Genial!', 'Exacto.', 'Perfecto, suena natural.', 'Sí, así es.', 'Jaja, buena.', 'Entendido.', '¡Gracias!', 'Claro, tiene sentido.', '¡Me encanta!', 'Vale, me parece bien.'];
+const tm = (fn, ms) => timers.push(setTimeout(fn, ms));
+let cs = null;
+function viewChat(v) {
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Шаг 6 · Тренинг предложений</span><h1>Бесконечная переписка</h1><p>Бот пишет тебе по-испански, ты собираешь ответ из слов. Ситуации и слова каждый раз меняются, поэтому закончить тренинг невозможно. Серия считает ответы подряд без ошибок.</p></div>
+  <div class="cwrap"><div class="cmodes"><button class="chip ${store.ui.cmode !== 'fix' ? 'on' : ''}" data-cmode="reply" type="button">Ответь в чате</button><button class="chip ${store.ui.cmode === 'fix' ? 'on' : ''}" data-cmode="fix" type="button">Найди ошибку</button></div>
+  <div class="phone" id="cphone"></div><p class="chatbest">Рекорд серии: ${store.best.chat || 0}</p></div>`;
+  chatStart(store.ui.cmode === 'fix' ? 'fix' : 'reply');
+}
+function chatStart(mode) {
+  clearTimers(); store.ui.cmode = mode; save();
+  $$('[data-cmode]').forEach(b => b.classList.toggle('on', b.dataset.cmode === mode));
+  cs = { mode, streak: 0, last: [], busy: false, tries: 0 };
+  const noTr = store.ui.tr === false;
+  $('#cphone').innerHTML = `<div class="ph-top"><span class="av" style="--ac:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.6)">Z</span><div><b>Zed</b><small>${mode === 'reply' ? 'Пишет тебе по-испански' : 'Пишет с ошибками'} · онлайн</small></div><span class="streak">${I.flame}<span id="cstreak">0</span></span></div><div class="msgs ${noTr ? 'notr' : ''}" id="msgs" aria-live="polite"></div><div class="cpanel" id="cpanel"></div><div class="ph-bar"><button class="btn sm ghost" data-dtr type="button">Перевод: ${noTr ? 'выкл' : 'вкл'}</button></div>`;
+  mode === 'reply' ? nextReply() : nextFix();
+}
+function chatAdd(side, en, ru) {
+  const box = $('#msgs'); if (!box) return;
+  const row = document.createElement('div'); row.className = 'msg' + (side === 'me' ? ' me' : '');
+  row.innerHTML = `<span class="av" style="--ac:${side === 'me' ? '#4D5BFF' : '#EE3E93'}">${side === 'me' ? 'Я' : 'Z'}</span><div class="bub" role="button" tabindex="0" data-say="${encodeURIComponent(en)}">${esc(en)}${ru ? `<span class="ru">${esc(ru)}</span>` : ''}</div>`;
+  box.appendChild(row); box.scrollTop = box.scrollHeight;
+  while (box.children.length > 12) box.removeChild(box.firstChild);
+}
+function chatBot(en, ru, then) {
+  const box = $('#msgs'); if (!box) return;
+  const row = document.createElement('div'); row.className = 'msg';
+  row.innerHTML = '<span class="av" style="--ac:#EE3E93">Z</span><span class="typing"><i></i><i></i><i></i></span>';
+  box.appendChild(row); box.scrollTop = box.scrollHeight;
+  tm(() => { row.remove(); chatAdd('bot', en, ru); then && then(); }, RM ? 0 : 650 + Math.min(en.length * 10, 500));
+}
+const setStreak = n => { cs.streak = n; const el = $('#cstreak'); if (el) el.textContent = n; if (n > (store.best.chat || 0)) { store.best.chat = n; save(); } };
+function nextReply() {
+  const idx = rnd(CT.map((t, i) => i).filter(i => !cs.last.includes(i)));
+  cs.last.push(idx); if (cs.last.length > 14) cs.last.shift();
+  const t = CT[idx], pick = {};
+  Object.keys(t.slots).forEach(k => pick[k] = rnd(t.slots[k]));
+  const f = (str, li) => str.replace(/\{(\w+)\}/g, (m, k) => pick[k][li]);
+  const cur = { t, bot: f(t.bot, 0), botRu: f(t.botRu, 1), ru: f(t.ru, 1), ans: f(t.ans, 0) };
+  cur.tokens = cur.ans.split(' ');
+  const base = cur.tokens.map((_, i) => i); let ids = shuffle(base);
+  if (ids.length > 1 && ids.join() === base.join()) ids.reverse();
+  Object.assign(cs, { cur, pool: ids, slot: [], tries: 0, busy: true });
+  $('#cpanel').innerHTML = '';
+  chatBot(cur.bot, cur.botRu, () => { cs.busy = false; paintReply(); });
+}
+const ROLES = ['s', 'v', 'o', 'p', 't', 'x', 'q'];
+function paintReply(msg, cls) {
+  const c = cs.cur, chip = (i, w) => `<button type="button" class="blk r-${ROLES[i % 7]}" data-ct="${i}" data-where="${w}">${esc(c.tokens[i])}</button>`;
+  $('#cpanel').innerHTML = `<div class="ctask"><span class="eyebrow">Ответь по-испански · ${esc(c.t.tag)}</span><p>«${esc(c.ru)}»</p></div><div class="slot">${cs.slot.map(i => chip(i, 'slot')).join('')}</div><div class="pool">${cs.pool.map(i => chip(i, 'pool')).join('')}</div><div class="ex-act"><button class="btn c sm" data-ccheck type="button">${I.check}Отправить</button><button class="btn ghost sm" data-creset type="button">${I.undo}Сброс</button><button class="btn ghost sm" data-chint type="button">${I.bulb}Подсказка</button><button class="btn ghost sm" data-cskip type="button">Пропустить</button></div><p class="ex-msg ${cls || ''}" id="cmsg">${msg || ''}</p>`;
+}
+function chatTile(btn) {
+  if (!cs || cs.mode !== 'reply' || cs.busy) return;
+  const i = +btn.dataset.ct;
+  if (btn.dataset.where === 'pool') { cs.pool = cs.pool.filter(x => x !== i); cs.slot.push(i); }
+  else { cs.slot = cs.slot.filter(x => x !== i); cs.pool.push(i); }
+  paintReply();
+}
+function chatCheck(btn) {
+  if (cs.busy) return;
+  const c = cs.cur;
+  if (cs.pool.length) { paintReply('Используй все слова.', 'badm'); return; }
+  const got = cs.slot.map(i => c.tokens[i]).join(' ');
+  if (got === c.ans) {
+    cs.busy = true; setStreak(cs.streak + 1);
+    const [x, y] = centerOf(btn); addXP(cs.tries ? 1 : 3, x, y - 20); confetti(x, y, 26);
+    $('#cpanel').innerHTML = '';
+    chatAdd('me', c.ans, c.ru); speak(c.ans);
+    tm(() => chatBot(rnd(REACT), '', () => tm(nextReply, 350)), 500);
+  } else {
+    cs.tries++; setStreak(0);
+    const wrong = cs.slot.findIndex((i, k) => c.tokens[i] !== c.tokens[k]);
+    paintReply('Почти! ' + c.t.tip + (cs.tries > 1 ? ' Нажми «Подсказка».' : ''), 'badm');
+    const el = $$('.cpanel .slot .blk')[wrong]; if (el) el.classList.add('wrong');
+  }
+}
+function chatHint() {
+  if (cs.mode !== 'reply' || cs.busy) return;
+  const c = cs.cur; cs.tries++;
+  paintReply('Начни с «' + esc(c.tokens[0]) + '». ' + esc(c.t.tip));
+}
+function chatSkip() {
+  if (cs.busy) return; const c = cs.cur; setStreak(0); cs.busy = true;
+  $('#cpanel').innerHTML = '';
+  chatAdd('me', '…', ''); chatBot('Правильно было так: ' + c.ans, c.t.tip, () => tm(nextReply, 900));
+}
+function nextFix() {
+  const idx = rnd(CFIX.map((t, i) => i).filter(i => !cs.last.includes(i)));
+  cs.last.push(idx); if (cs.last.length > 12) cs.last.shift();
+  const it = CFIX[idx]; cs.item = it; cs.opts = shuffle([it[1], it[2], it[3]]); cs.busy = true; cs.answered = false;
+  $('#cpanel').innerHTML = '';
+  chatBot(it[0], '', () => { cs.busy = false; paintFix(); });
+}
+function paintFix(picked) {
+  const it = cs.item;
+  $('#cpanel').innerHTML = `<div class="ctask"><span class="eyebrow">Как правильно сказать?</span></div><div class="opts">${cs.opts.map((o, i) => `<button type="button" class="qopt ${picked != null && o === it[1] ? 'right' : ''} ${picked === i && o !== it[1] ? 'no' : ''}" data-copt="${i}" ${picked != null ? 'disabled' : ''}><span class="en">${esc(o)}</span></button>`).join('')}</div>${picked != null ? `<p class="why ${cs.opts[picked] === it[1] ? 'good' : ''}">${esc(it[4])}</p><button class="btn c" data-cnext type="button">Дальше ${I.arrow}</button>` : ''}`;
+}
+function chatPick(btn) {
+  if (cs.busy || cs.answered) return; cs.answered = true;
+  const i = +btn.dataset.copt, ok = cs.opts[i] === cs.item[1];
+  if (ok) { setStreak(cs.streak + 1); const [x, y] = centerOf(btn); addXP(3, x, y - 20); confetti(x, y, 24); }
+  else setStreak(0);
+  paintFix(i); speak(cs.item[1]);
+}
+
+/* ═══════════ VIEW: SCIENCE ═══════════ */
+function viewScience(v) {
+  const F = [
+    ['5 гласных', 'var(--c-s)', 'Испанский читается как пишется', 'В испанском пять чистых гласных и очень последовательные правила чтения. Увидел слово, значит почти наверняка знаешь, как оно звучит. Поэтому озвучка и карточки работают так хорошо.', 'Real Academia Española (2010). Ortografía de la lengua española'],
+    ['Ядро', 'var(--c-v)', 'Начинать нужно с частотного ядра', 'Частотные словари показывают: небольшого ядра самых частых слов достаточно, чтобы понимать большую часть повседневной речи. Поэтому в приложении самая база: сначала то, что встречается чаще всего.', 'Davies, M. (2006). A Frequency Dictionary of Spanish. Routledge'],
+    ['×1,5+', 'var(--c-o)', 'Вспоминать лучше, чем перечитывать', 'В эксперименте студенты, которые проверяли себя, через неделю помнили заметно больше, чем те, кто перечитывал текст. Поэтому карточки сначала заставляют вспомнить, а потом показывают ответ.', 'Roediger & Karpicke (2006), Psychological Science'],
+    ['Пауза', 'var(--c-p)', 'Повторы с интервалами', 'Повторения, растянутые во времени, запоминаются надёжнее, чем зубрёжка за один раз. Коробки Лейтнера автоматически растягивают интервалы.', 'Cepeda et al. (2006), Psychological Bulletin; Leitner (1972)'],
+    ['Живая речь', 'var(--c-x)', 'Разговорка отличается от учебника', 'В жизни говорят vale, tío, guay, а в учебниках пишут «de acuerdo» и «amigo». Поэтому здесь есть сленг, диалоги и чат-тренинг. Слова зависят от страны: в Испании coche и móvil, в Латинской Америке carro и celular.', 'Наблюдение, а не исследование: для точных данных смотри корпуса CREA и CORPES XXI (RAE)'],
+    ['2 мира', 'var(--c-t)', 'Испания и Латинская Америка', 'Главное отличие в местоимениях: в Испании говорят vosotros, в Латинской Америке ustedes. В Аргентине и некоторых странах вместо tú говорят vos. В приложении выбрана нейтральная база, а региональные слова помечены.', 'Instituto Cervantes, El español: una lengua viva']
+  ];
+  v.innerHTML = `<div class="sec-h"><span class="eyebrow">Почему это работает</span><h1>Научная база</h1><p>Приложение построено на тех же идеях, что и английская версия, плюс особенности испанского.</p></div>
+  <div class="sci">${F.map(([n, r, h, p, c]) => `<article class="card fact" style="--r:${r}"><span class="num">${n}</span><h3>${h}</h3><p>${p}</p><cite>${c}</cite></article>`).join('')}</div>
+  <section class="card how"><h3>Как отбирались слова</h3>
+    <ol>
+      <li>Взята самая база: слова, без которых не обойтись в первые месяцы. Всё остальное можно добрать потом.</li>
+      <li>Примеры написаны с переводом и короткие, чтобы их можно было сразу сказать вслух.</li>
+      <li>Раздел «Разговорка» собирает сленг Испании и Латинской Америки. «Маты 18+» закрыты по умолчанию, у каждого слова указана жёсткость и регион. Оскорбления по расе, национальности и ориентации я не включал.</li>
+      <li>Отбор, переводы и примеры авторские. Это ядро для старта, а не официальный список.</li>
+    </ol>
+    <div class="tip">${I.bulb}<p>Простой режим: 10 карточек в день в режиме «Русский → Español» и один диалог в разделе «Разговор». Через месяц это сотни повторений.</p></div>
+  </section>`;
+}
+
+const VIEWS = { start: viewStart, build: viewBuild, tenses: viewTenses, words: viewWords, talk: viewTalk, chat: viewChat, train: viewTrain, games: viewGames, science: viewScience };
+
+/* ═══════════ EVENTS ═══════════ */
+document.addEventListener('click', e => {
+  { const sp = e.target.closest('.btn,.cell,.step,.mode'); if (sp && !RM) confetti(e.clientX, e.clientY, 7); }
+  const term = e.target.closest('.term'); if (term) { e.stopPropagation(); const w = decodeURIComponent(term.dataset.term); toast(w + ' — ' + term.dataset.tip); speak(w); return; }
+  const dl = e.target.closest('[data-dlg]'); if (dl) { playDialog(+dl.dataset.dlg); return; }
+  if (e.target.closest('[data-dreplay]')) { playDialog(store.ui.dlg || 0); return; }
+  if (e.target.closest('[data-dnext]')) { playDialog(((store.ui.dlg || 0) + 1) % DIALOGS.length); return; }
+  const dtr = e.target.closest('[data-dtr]'); if (dtr) { store.ui.tr = store.ui.tr === false; save(); $('#msgs').classList.toggle('notr', store.ui.tr === false); dtr.textContent = 'Перевод: ' + (store.ui.tr === false ? 'выкл' : 'вкл'); return; }
+  if (e.target.closest('[data-dsayall]')) { speak(DIALOGS[store.ui.dlg || 0].l.map(x => plainT(x[1])).join(' ')); return; }
+  if (e.target.closest('[data-adult]')) { store.ui.adult = true; save(); refreshWords(); stats(); paintCats(); paintWords(); toast('18+ включён. Эти слова нужны, чтобы понимать, а не чтобы ругаться на работе.'); return; }
+  if (e.target.closest('[data-adult-off]')) { store.ui.adult = false; store.ui.cat = 'all'; save(); refreshWords(); stats(); paintCats(); paintWords(); return; }
+  if (e.target.closest('[data-swear]')) { store.ui.cat = 'swear'; save(); }
+  const vbb = e.target.closest('[data-verb]'); if (vbb) { store.ui.verb = vbb.dataset.verb; save(); renderTense(store.ui.tense, false); return; }
+  const ct = e.target.closest('[data-ct]'); if (ct) { chatTile(ct); return; }
+  const cm = e.target.closest('[data-cmode]'); if (cm) { chatStart(cm.dataset.cmode); return; }
+  const cck = e.target.closest('[data-ccheck]'); if (cck) { chatCheck(cck); return; }
+  if (e.target.closest('[data-creset]') && cs && !cs.busy) { cs.pool = cs.pool.concat(cs.slot); cs.slot = []; cs.pool = shuffle(cs.pool); paintReply(); return; }
+  if (e.target.closest('[data-chint]')) { chatHint(); return; }
+  if (e.target.closest('[data-cskip]')) { chatSkip(); return; }
+  const cop = e.target.closest('[data-copt]'); if (cop) { chatPick(cop); return; }
+  if (e.target.closest('[data-cnext]')) { nextFix(); return; }
+  const sayEl = e.target.closest('[data-say]');
+  if (sayEl) { e.stopPropagation(); speak(decodeURIComponent(sayEl.dataset.say)); return; }
+  const ls = e.target.closest('[data-lesson]');
+  if (ls) { store.ui.lesson = +ls.dataset.lesson; save(); renderLessons(store.ui.lesson); renderLesson(store.ui.lesson); $('#lesson').scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); return; }
+  const ex = e.target.closest('[data-ex]'); if (ex) { exClick(ex, e); return; }
+  const cell = e.target.closest('.cell[data-t]'); if (cell) { det = { r: null, c: null }; detectPick(); renderTense(cell.dataset.t, true); return; }
+  const qo = e.target.closest('.qi .qopt'); if (qo) { tenseQuiz(qo); return; }
+  const dr = e.target.closest('[data-drow]'); if (dr) { det.r = +dr.dataset.drow; if (det.c === -1) det.c = null; detectPick(); return; }
+  const dc = e.target.closest('[data-dcol]'); if (dc) { det.c = +dc.dataset.dcol; detectPick(); return; }
+  const cat = e.target.closest('[data-cat]'); if (cat) { store.ui.cat = cat.dataset.cat; save(); openW = null; wLimit = 60; paintCats(); paintWords(); return; }
+  const tr = e.target.closest('[data-tier]'); if (tr) { tierF = +tr.dataset.tier; wLimit = 60; paintCats(); paintWords(); return; }
+  if (e.target.closest('#musicOnly')) { musicOnly = !musicOnly; wLimit = 60; $('#musicOnly').classList.toggle('on', musicOnly); paintWords(); return; }
+  if (e.target.closest('[data-more]')) { wLimit += 60; paintWords(); return; }
+  const tt = e.target.closest('[data-ttier]'); if (tt) { store.ui.ttier = +tt.dataset.ttier; save(); paintTcats(); newSession(); return; }
+  const gm = e.target.closest('[data-game]'); if (gm) { gameIntro(gm.dataset.game); return; }
+  if (e.target.closest('[data-play]')) { gameStart(); return; }
+  const sp = e.target.closest('[data-sp]'); if (sp) { speedPick(sp); return; }
+  const pc = e.target.closest('[data-pc]'); if (pc) { pairPick(+pc.dataset.pc); return; }
+  const tk = e.target.closest('[data-tr]'); if (tk) { trackPick(tk); return; }
+  if (e.target.closest('[data-tnext]')) { game.i++; game.answered = false; game.opts = null; paintTrack(); return; }
+  if (e.target.closest('#hideKnown')) { hideKnown = !hideKnown; $('#hideKnown').classList.toggle('on', hideKnown); paintWords(); return; }
+  const kn = e.target.closest('[data-know]');
+  if (kn) { const w = decodeURIComponent(kn.dataset.know); const was = box(w) >= 4; store.box[w] = was ? 1 : 5; save(); if (!was) { const [x, y] = centerOf(kn); confetti(x, y, 26); addXP(2, x, y - 20); } stats(); paintWords(); return; }
+  const wc = e.target.closest('.w[data-w]'); if (wc) { const w = decodeURIComponent(wc.dataset.w); const was = openW; openW = openW === w ? null : w; $$('.w.open').forEach(x => { x.classList.remove('open'); x.setAttribute('aria-expanded', 'false'); }); if (openW) { wc.classList.add('open'); wc.setAttribute('aria-expanded', 'true'); } return; }
+  const md = e.target.closest('[data-mode]'); if (md) { store.ui.mode = md.dataset.mode; if (store.ui.mode === 'gap' && store.ui.tcat === 'phrases') store.ui.tcat = 'all'; save(); $$('[data-mode]').forEach(b => b.classList.toggle('on', b === md)); paintTcats(); newSession(); return; }
+  const tc = e.target.closest('[data-tcat]'); if (tc) { store.ui.tcat = tc.dataset.tcat; save(); paintTcats(); newSession(); return; }
+  if (e.target.closest('[data-flip]') || e.target.closest('#flip')) { if (sess && !sess.flipped) { sess.flipped = true; paintArena(); } return; }
+  const gr = e.target.closest('[data-grade]'); if (gr) { grade(+gr.dataset.grade, gr); return; }
+  const pk = e.target.closest('[data-pick]'); if (pk) { pick(pk); return; }
+  if (e.target.closest('[data-next]')) { sess.i++; sess.answered = false; sess.opts = null; paintArena(); return; }
+  if (e.target.closest('[data-again]')) { newSession(); return; }
+});
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea')) return;
+  const tgt = e.target.closest('.w[data-w],#flip');
+  if (tgt && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); tgt.click(); return; }
+  if (location.hash === '#games' && game && game.id === 'speed' && ['1', '2', '3', '4'].includes(e.key)) { const b = $$('[data-sp]')[+e.key - 1]; if (b) b.click(); return; }
+  if (location.hash === '#train' && sess && sess.i < sess.items.length) {
+    if ((sess.mode === 'ru-en' || sess.mode === 'en-ru')) {
+      if (!sess.flipped && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); sess.flipped = true; paintArena(); }
+      else if (sess.flipped && ['1', '2', '3'].includes(e.key)) { const b = $(`[data-grade="${+e.key - 1}"]`); if (b) b.click(); }
+    } else if (!sess.answered && ['1', '2', '3', '4'].includes(e.key)) { const b = $$('[data-pick]')[+e.key - 1]; if (b) b.click(); }
+    else if (sess.answered && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); const b = $('[data-next]'); if (b) b.click(); }
+  }
+});
+
+route();
+})();
+</script>
+
+<script>
+document.getElementById('langsw').addEventListener('click', function (e) {
+  try { localStorage.setItem('blocks-lang', 'en'); } catch (x) {}
+  e.preventDefault(); location.href = 'en.html' + location.hash;
+});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+</script>
+</html>

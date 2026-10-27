@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#EEF1F8">
+<title>Blocks</title><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
+<style>html,body{margin:0;height:100%;background:#EEF1F8}</style></head>
+<body><script>
+var l = 'en'; try { l = localStorage.getItem('blocks-lang') === 'es' ? 'es' : 'en'; } catch (e) {}
+location.replace((l === 'es' ? 'es.html' : 'en.html') + location.hash);
+</script></body></html>
