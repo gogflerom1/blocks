@@ -523,6 +523,13 @@ main{max-width:1200px;margin:0 auto;padding-block:28px 60px;padding-left:max(16p
 }
 @media (min-width:721px){.cwrap .phone{min-height:620px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* language switch */
+.langs{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);flex:none}
+.langs a{padding:5px 10px;border-radius:999px;font-weight:800;font-size:12px;text-decoration:none;color:var(--muted);white-space:nowrap}
+.langs a.on{background:var(--ink);color:var(--surface)}
+.langs a:not(.on):hover{color:var(--ink)}
+.top-in{gap:8px}
+@media (max-width:520px){.brand{font-size:14px;gap:6px}.brand svg{width:24px;height:24px}.top-in{gap:6px}.stats .stat:nth-child(3){display:none}.langs a{padding:4px 7px;font-size:11px}.lvl{padding-right:8px}}
 </style>
 
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -532,7 +539,7 @@ main{max-width:1200px;margin:0 auto;padding-block:28px 60px;padding-left:max(16p
     English Blocks
   </a>
   <nav class="nav" id="nav" aria-label="Разделы"></nav>
-  <div class="stats" id="stats"></div><a class="lang" id="langsw" href="es.html" title="Сменить язык">ES</a>
+  <div class="stats" id="stats"></div><nav class="langs" id="langsw" aria-label="Язык"><a href="en.html" class="on">EN</a><a href="es.html">ES</a><a href="pt.html">PT</a></nav>
 </div></header>
 <main id="view"></main>
 <nav class="tabbar" id="tabbar" aria-label="Разделы"></nav>
@@ -1652,9 +1659,13 @@ route();
 </script>
 
 <script>
-document.getElementById('langsw').addEventListener('click', function (e) {
-  try { localStorage.setItem('blocks-lang', 'es'); } catch (x) {}
-  e.preventDefault(); location.href = 'es.html' + location.hash;
+Array.prototype.forEach.call(document.querySelectorAll('#langsw a'), function (a) {
+  a.addEventListener('click', function (e) {
+    var l = a.textContent.trim().toLowerCase();
+    try { localStorage.setItem('blocks-lang', l); } catch (x) {}
+    if (a.classList.contains('on')) return;
+    e.preventDefault(); location.href = a.getAttribute('href') + location.hash;
+  });
 });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
 </script>
