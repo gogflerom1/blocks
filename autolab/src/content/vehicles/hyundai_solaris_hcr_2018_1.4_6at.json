@@ -1,0 +1,418 @@
+{
+  "profile_version": "1.1.0",
+  "id": "hyundai-solaris-hcr-2018-1.4-6at-ru",
+  "title": "Hyundai Solaris HCR 2018 1.4 MPI 6AT (RU)",
+  "locale": "ru-RU",
+  "market": "RU",
+  "vehicle": {
+    "manufacturer": "Hyundai",
+    "model": "Solaris",
+    "generation": "HCR",
+    "model_year": 2018,
+    "body": "sedan",
+    "drive": "FWD",
+    "transmission_summary": "6-speed hydromechanical automatic",
+    "engine_summary": "Kappa 1.4 MPI gasoline",
+    "make": "Hyundai",
+    "year": 2018
+  },
+  "powertrain": {
+    "engine": {
+      "family": "Kappa 1.4 MPI",
+      "code": "G4LC",
+      "fuel": "gasoline",
+      "layout": "inline-4",
+      "displacement_cc": 1368,
+      "bore_mm": 72.0,
+      "stroke_mm": 84.0,
+      "compression_ratio": 10.5,
+      "cylinders": 4,
+      "valves_per_cylinder": 4,
+      "valvetrain": "DOHC",
+      "timing_drive": "chain",
+      "firing_order": "1-3-4-2",
+      "power_kw": 73.3,
+      "power_hp": 99.7,
+      "power_rpm": 6000,
+      "torque_nm": 132,
+      "torque_rpm": 4000,
+      "fuel_min_octane_ron": 92,
+      "emissions_standard": "Euro 5",
+      "engine_oil": {
+        "system_capacity_l": 3.8,
+        "service_fill_l": 3.5,
+        "quality": "ACEA A5/B5 or higher",
+        "viscosity_by_temperature": [
+          {
+            "ambient": "from -30°C to above +30°C",
+            "sae": [
+              "5W-20",
+              "5W-30"
+            ]
+          },
+          {
+            "ambient": "from -20°C to above +30°C",
+            "sae": [
+              "10W-30"
+            ]
+          },
+          {
+            "ambient": "from -15°C to above +30°C",
+            "sae": [
+              "15W-40"
+            ]
+          },
+          {
+            "ambient": "from -10°C to above +30°C",
+            "sae": [
+              "20W-50"
+            ]
+          }
+        ],
+        "oil_filter_part_number": "26300-02503"
+      }
+    },
+    "transmission": {
+      "type": "hydromechanical automatic",
+      "gears": 6,
+      "model": "A6GF1-2",
+      "selector_positions": [
+        "P",
+        "R",
+        "N",
+        "D"
+      ],
+      "atf_spec": "ATF SP-IV",
+      "capacity_l": null,
+      "capacity_note": "Exact total fill capacity is intentionally left unset until tied to a Solaris HCR 1.4-specific service source."
+    }
+  },
+  "chassis": {
+    "front_suspension": "MacPherson independent",
+    "rear_suspension": "semi-independent torsion-beam",
+    "steering": "rack-and-pinion, electric assist",
+    "brakes": {
+      "abs": true,
+      "esc": true,
+      "tcs": true,
+      "ebd": true,
+      "note": "Rear brake hardware depends on trim/options; do not hard-code rear disc brakes for every 2018 1.4 configuration."
+    }
+  },
+  "fuel_system": {
+    "tank_capacity_l": 50,
+    "pump": "electric, in-tank",
+    "return_system": "returnless"
+  },
+  "maintenance": {
+    "normal_schedule_basis": "Official Hyundai Solaris HCR periodic maintenance table",
+    "intervals": [
+      {
+        "id": "engine_oil_filter",
+        "name": "Engine oil and oil filter",
+        "action": "replace",
+        "every_km": 15000,
+        "every_months": 12,
+        "additional_check": "Check engine-oil level and leaks every 500 km or before a long trip."
+      },
+      {
+        "id": "engine_air_filter",
+        "name": "Engine air filter",
+        "action": "replace",
+        "every_km": 15000,
+        "every_months": 12
+      },
+      {
+        "id": "cabin_filter",
+        "name": "Cabin ventilation filter",
+        "action": "replace",
+        "every_km": 15000,
+        "every_months": 12,
+        "condition": "if equipped"
+      },
+      {
+        "id": "fuel_filter",
+        "name": "Fuel filter",
+        "action": "inspect_replace_cycle",
+        "inspect_km": [
+          30000,
+          90000
+        ],
+        "replace_km": [
+          60000,
+          120000
+        ]
+      },
+      {
+        "id": "spark_plugs",
+        "name": "Spark plugs, Kappa 1.4",
+        "action": "replace",
+        "every_km": 60000
+      },
+      {
+        "id": "valve_clearance",
+        "name": "Valve clearance",
+        "action": "inspect_adjust_if_needed",
+        "every_km": 90000
+      },
+      {
+        "id": "cooling_system",
+        "name": "Cooling system",
+        "action": "inspect",
+        "at_km": [
+          60000,
+          90000,
+          120000
+        ]
+      },
+      {
+        "id": "coolant",
+        "name": "Engine coolant",
+        "action": "replace",
+        "first_km": 210000,
+        "first_months": 120,
+        "then_every_km": 30000,
+        "then_every_months": 24
+      },
+      {
+        "id": "brake_fluid",
+        "name": "Brake fluid",
+        "action": "inspect_or_replace",
+        "inspect_km": [
+          15000,
+          45000,
+          75000,
+          105000
+        ],
+        "replace_km": [
+          30000,
+          60000,
+          90000,
+          120000
+        ]
+      },
+      {
+        "id": "brake_components",
+        "name": "Brake lines, hoses, discs and pads",
+        "action": "inspect",
+        "every_km": 15000,
+        "every_months": 12
+      },
+      {
+        "id": "tires",
+        "name": "Tire pressure and tread wear",
+        "action": "inspect",
+        "every_km": 15000,
+        "every_months": 12
+      },
+      {
+        "id": "battery",
+        "name": "Battery condition",
+        "action": "inspect",
+        "every_km": 15000,
+        "every_months": 12
+      },
+      {
+        "id": "atf_level",
+        "name": "Automatic-transmission fluid level",
+        "action": "inspect",
+        "every_km": 15000,
+        "every_months": 12,
+        "condition": "only where the transmission version has a dipstick; follow the exact service procedure for the installed transmission"
+      }
+    ]
+  },
+  "interactive_underhood": {
+    "note": "These are semantic hotspots. Bind them to actual 3D object names / coordinates after the GLB model is loaded; coordinates are intentionally not fabricated.",
+    "hotspots": [
+      {
+        "id": "engine_mount_right",
+        "label": "Right powertrain mount",
+        "reference_index": 1,
+        "model_anchor": null
+      },
+      {
+        "id": "engine_oil_filler",
+        "label": "Engine oil filler cap",
+        "reference_index": 2,
+        "model_anchor": null
+      },
+      {
+        "id": "engine_oil_dipstick",
+        "label": "Engine oil dipstick",
+        "reference_index": 3,
+        "model_anchor": null
+      },
+      {
+        "id": "ecu",
+        "label": "Engine control unit (ECU)",
+        "reference_index": 4,
+        "model_anchor": null
+      },
+      {
+        "id": "battery",
+        "label": "12 V battery",
+        "reference_index": 5,
+        "model_anchor": null
+      },
+      {
+        "id": "engine_air_filter",
+        "label": "Engine air filter",
+        "reference_index": 6,
+        "model_anchor": null
+      },
+      {
+        "id": "air_duct",
+        "label": "Air duct",
+        "reference_index": 7,
+        "model_anchor": null
+      },
+      {
+        "id": "radiator_filler",
+        "label": "Radiator filler neck",
+        "reference_index": 8,
+        "model_anchor": null
+      },
+      {
+        "id": "throttle_body",
+        "label": "Throttle body",
+        "reference_index": 9,
+        "model_anchor": null
+      },
+      {
+        "id": "intake_manifold",
+        "label": "Intake manifold",
+        "reference_index": 10,
+        "model_anchor": null
+      },
+      {
+        "id": "coolant_expansion_tank",
+        "label": "Coolant expansion-tank filler",
+        "reference_index": 11,
+        "model_anchor": null
+      },
+      {
+        "id": "alternator",
+        "label": "Alternator",
+        "reference_index": 12,
+        "model_anchor": null
+      },
+      {
+        "id": "accessory_belt",
+        "label": "Accessory drive belt",
+        "reference_index": 13,
+        "model_anchor": null
+      }
+    ]
+  },
+  "safety_rules": [
+    {
+      "id": "coolant_hot",
+      "severity": "danger",
+      "text": "Do not open the radiator/expansion-tank cap on a hot engine. Allow the engine to cool first."
+    },
+    {
+      "id": "oil_warning",
+      "severity": "danger",
+      "text": "If the engine-oil pressure warning remains on while the engine is running, stop safely, shut the engine off and check the oil level."
+    },
+    {
+      "id": "atf_procedure",
+      "severity": "warning",
+      "text": "ATF level/fill procedures depend on the exact transmission and specified fluid temperature. Do not present a universal beginner procedure."
+    }
+  ],
+  "source_policy": {
+    "rule": "Every technical field shown to the user must carry a source_id. Unknown or unverified values must remain null instead of being guessed.",
+    "preferred_sources": [
+      "official_owner_manual",
+      "official_maintenance",
+      "service_repair_manual"
+    ]
+  },
+  "sources": [
+    {
+      "id": "official_owner_manual",
+      "type": "manufacturer_owner_manual",
+      "title": "Hyundai Solaris — Руководство по эксплуатации, модели 2011–2018",
+      "url": "https://www.hyundai.ru/service/manuals/solaris",
+      "pdf_url": "https://www.hyundai.ru/storage/manual/62020e95e3cf9_file.pdf",
+      "publisher": "Hyundai Russia"
+    },
+    {
+      "id": "official_maintenance",
+      "type": "manufacturer_maintenance_schedule",
+      "title": "Solaris HCR — регламент периодического технического обслуживания",
+      "url": "https://www.hyundai.ru/assets/pdf/maintenance/maintenance-solaris.pdf",
+      "publisher": "Hyundai Russia"
+    },
+    {
+      "id": "official_specs",
+      "type": "manufacturer_spec_sheet",
+      "title": "Hyundai Solaris — комплектации и силовые агрегаты",
+      "url": "https://www.configurator.hyundai.ru/price_list/Solaris.pdf",
+      "publisher": "Hyundai Russia"
+    },
+    {
+      "id": "repair_manual_engine",
+      "type": "repair_manual",
+      "title": "Hyundai Solaris с 2017 г. — руководство по ремонту и техническому обслуживанию, демонстрационный фрагмент",
+      "url": "https://krutilvertel.com/pdf/demo/mak/hyundai-solaris-2017.pdf",
+      "publisher": "Третий Рим / КрутиВерти"
+    },
+    {
+      "id": "service_manual_transmission",
+      "type": "service_manual_mirror",
+      "title": "Hyundai Solaris HCR — идентификационные номера и код АКПП",
+      "url": "https://carmanuals.ru/hyundai/hyundai-solaris-hcr/obshchie-svedeniya/identifikacionnye-nomera-obshchie-svedeniya",
+      "publisher": "Carmanuals service manual mirror"
+    },
+    {
+      "id": "service_manual_atf",
+      "type": "service_manual_mirror",
+      "title": "Hyundai Solaris HCR — жидкость для АКПП (ATF), ремонтные процедуры",
+      "url": "https://carmanuals.ru/hyundai/hyundai-solaris-hcr/akpp/akpp/zhidkost-dlya-akpp-atf/remontnye-procedury",
+      "publisher": "Carmanuals service manual mirror"
+    }
+  ],
+  "field_sources": {
+    "vehicle.model_year": [
+      "official_specs"
+    ],
+    "vehicle.drive": [
+      "repair_manual_engine"
+    ],
+    "powertrain.engine": [
+      "repair_manual_engine"
+    ],
+    "powertrain.transmission.model": [
+      "service_manual_transmission"
+    ],
+    "powertrain.transmission.atf_spec": [
+      "service_manual_atf"
+    ],
+    "chassis.front_suspension": [
+      "official_specs"
+    ],
+    "chassis.rear_suspension": [
+      "official_specs"
+    ],
+    "fuel_system.tank_capacity_l": [
+      "service_manual_transmission"
+    ],
+    "maintenance": [
+      "official_maintenance"
+    ],
+    "interactive_underhood.hotspots": [
+      "repair_manual_engine"
+    ],
+    "safety_rules.coolant_hot": [
+      "official_owner_manual"
+    ]
+  },
+  "last_verified": "2026-10-31",
+  "make": "Hyundai",
+  "model": "Solaris",
+  "year": 2018,
+  "generation": "HCR"
+}

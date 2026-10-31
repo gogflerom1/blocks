@@ -13,13 +13,21 @@ const BELT = 0.97;
 const WB = 1.3, WR = 0.315, TRACK = 0.77;
 const ARCH = 0.4;
 const NU = 190, NV = 76;
-const HOOD_X0 = 0.68, HOOD_X1 = 2.02, HATCH_X1 = -1.12;
+const HOOD_X0 = 0.68, HOOD_X1 = 2.02;
+let HATCH_X1 = -1.12;
 const HOOD_V = [18, NV - 1 - 18], HATCH_V = [14, NV - 1 - 14];
 
-const TOP: [number, number][] = [
+const TOP_HATCH: [number, number][] = [
   [2.2, 0.56], [2.18, 0.68], [2.08, 0.78], [1.85, 0.84], [1.3, 0.9], [0.68, 0.97], [0.32, 1.18], [-0.04, 1.39],
   [-0.5, 1.45], [-1.12, 1.42], [-1.45, 1.27], [-1.8, 1.08], [-2.02, 1.0], [-2.1, 0.9], [-2.14, 0.66],
 ];
+// седан: короче заднее стекло, горизонтальная крышка багажника
+const TOP_SEDAN: [number, number][] = [
+  [2.2, 0.56], [2.18, 0.68], [2.08, 0.78], [1.85, 0.84], [1.3, 0.9], [0.68, 0.97], [0.32, 1.18], [-0.04, 1.39],
+  [-0.5, 1.45], [-0.98, 1.43], [-1.3, 1.31], [-1.6, 1.08], [-1.75, 1.03], [-2.02, 1.0], [-2.11, 0.9], [-2.14, 0.66],
+];
+let TOP = TOP_HATCH;
+let GLASS_X0 = -2.0;
 
 function topY(x: number) {
   for (let i = 0; i < TOP.length - 1; i++) {
@@ -194,7 +202,12 @@ export class CarScene {
   private disposed = false;
   autoRotateUntilInteract = true;
 
-  constructor(el: HTMLElement, opts: { autoRotate?: boolean } = {}) {
+  constructor(el: HTMLElement, opts: { autoRotate?: boolean; body?: string } = {}) {
+    // форма кузова по профилю машины: седан или хэтчбек
+    const sedan = opts.body === 'sedan';
+    TOP = sedan ? TOP_SEDAN : TOP_HATCH;
+    HATCH_X1 = sedan ? -1.64 : -1.12;
+    GLASS_X0 = sedan ? -1.62 : -2.0;
     this.el = el;
     const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     r.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -278,7 +291,7 @@ export class CarScene {
         const k = (i * NV + j) * 3;
         pos[k] = x1; pos[k + 1] = y1; pos[k + 2] = z;
         const roof = x < -0.12 && x > -1.08 && y1 > yt - 0.05;
-        glass[i * NV + j] = y1 > BELT + 0.03 && !roof && x < 0.62 && x > -2.0 ? 1 : 0;
+        glass[i * NV + j] = y1 > BELT + 0.03 && !roof && x < 0.62 && x > GLASS_X0 ? 1 : 0;
       }
     }
     const ui = (x: number) => Math.round(((x - XR) / (XF - XR)) * (NU - 1));

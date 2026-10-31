@@ -4,6 +4,7 @@ import { Particles, Pt } from '../../lib/path';
 import { useInfo } from '../../lib/info';
 import { AT_APPLY, AT_ELEMENTS } from '../../content/transmission';
 import { Callout, Range, Seg, Stage } from '../../ui/kit';
+import { useVehicle } from '../../lib/vehicle';
 
 /* ── Гидротрансформатор ───────────────────────────── */
 const TC_MODES = [
@@ -242,12 +243,14 @@ function Selector() {
 }
 
 export function Automatic() {
+  const v = useVehicle();
+  const mineModel = v?.powertrain.transmission?.type?.includes('automatic') ? v.powertrain.transmission.model : null;
   return (
     <div className="stack" style={{ gap: 18 }}>
       <TorqueConverter />
       <Planetary />
       <Selector />
-      <p className="footer-note">Реальные автоматы используют 2–4 связанных планетарных ряда. Схема включения элементов показана для конкретной конструкции; у других коробок она своя.</p>
+      <p className="footer-note">{mineModel && <><b style={{ color: 'var(--amber)' }}>У вашей {mineModel} схема включения своя — таблица выше показана на примере ZF 6HP и к вашей коробке не относится.</b> </>}Реальные автоматы используют 2–4 связанных планетарных ряда. Схема включения элементов показана для конкретной конструкции; у других коробок она своя.</p>
     </div>
   );
 }

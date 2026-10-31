@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FLUIDS, Fluid } from '../../content/underhood';
 import { Callout, ModHead, Range, Seg, SafetyTag, Stage } from '../../ui/kit';
 import { CapIcon, EngineBay } from './EngineBay';
+import { AMBIENT_RU, Profile, RULE_RU, ru, useVehicle } from '../../lib/vehicle';
+import { Fact, MyCarBadge, SrcChip } from '../../ui/src';
 
 const POS: Record<string, [number, number]> = { oil: [340, 262], coolant: [136, 162], brake: [597, 158], washer: [136, 458], ps: [222, 447], atf: [566, 330] };
 
@@ -93,9 +95,48 @@ function BrakeTank() {
   );
 }
 
+/** Данные из профиля машины для выбранной жидкости */
+function ForMyCar({ f, p }: { f: Fluid; p: Profile }) {
+  const e = p.powertrain.engine, oil = e?.engine_oil, t = p.powertrain.transmission;
+  const rule = (id: string) => p.safety_rules?.find((r) => r.id === id);
+  const R = ({ id }: { id: string }) => { const r = rule(id); return r ? <Callout kind={r.severity === 'danger' ? 'stop' : 'warn'}>{RULE_RU[r.id] ?? r.text} <SrcChip p={p} path={`safety_rules.${r.id}`} /></Callout> : null; };
+  return (
+    <div className="panel" style={{ borderColor: 'rgba(54,224,160,.35)' }}>
+      <span className="eyebrow" style={{ color: 'var(--green)' }}>Для вашего {p.model} {p.generation} {e?.code}</span>
+      {f.id === 'oil' && <>
+        <Fact p={p} path="powertrain.engine.engine_oil.service_fill_l" label="Заливать при замене" v={oil?.service_fill_l} unit="л" />
+        <Fact p={p} path="powertrain.engine.engine_oil.system_capacity_l" label="Объём системы" v={oil?.system_capacity_l} unit="л" />
+        <Fact p={p} path="powertrain.engine.engine_oil.quality" label="Класс" v={oil?.quality}>{ru(oil?.quality)}</Fact>
+        <Fact p={p} path="powertrain.engine.engine_oil.viscosity_by_temperature" label="Вязкость" v={oil?.viscosity_by_temperature?.length ? 1 : null}>{oil?.viscosity_by_temperature?.map((r) => `${r.sae.join('/')} (${AMBIENT_RU(r.ambient)})`).join('; ')}</Fact>
+        <Fact p={p} path="powertrain.engine.engine_oil.oil_filter_part_number" label="Фильтр" v={oil?.oil_filter_part_number} />
+        <div style={{ marginTop: 8 }}><R id="oil_warning" /></div>
+      </>}
+      {f.id === 'coolant' && <>
+        <Fact p={p} path="powertrain.engine.coolant" label="Тип антифриза" v={null} />
+        <Fact p={p} path="powertrain.engine.coolant" label="Объём" v={null} />
+        <div style={{ marginTop: 8 }}><R id="coolant_hot" /></div>
+      </>}
+      {f.id === 'brake' && <>
+        <Fact p={p} path="chassis.brakes.fluid" label="Тип жидкости" v={null} />
+        <p className="muted" style={{ fontSize: 13, marginTop: 6 }}>В профиле нет спецификации тормозной жидкости — смотрите надпись на крышке бачка и руководство.</p>
+      </>}
+      {f.id === 'washer' && <p className="muted" style={{ fontSize: 13.5 }}>Профиль не задаёт ничего особенного для омывайки.</p>}
+      {f.id === 'ps' && <Fact p={p} path="chassis.steering" label="Рулевое" v={p.chassis?.steering}>{ru(p.chassis?.steering)} — бачка ГУР нет</Fact>}
+      {f.id === 'atf' && <>
+        <Fact p={p} path="powertrain.transmission.model" label="Коробка" v={t?.model} />
+        <Fact p={p} path="powertrain.transmission.atf_spec" label="Жидкость" v={t?.atf_spec} />
+        <Fact p={p} path="powertrain.transmission.capacity_l" label="Объём" v={t?.capacity_l} unit="л" />
+        <div style={{ marginTop: 8 }}><R id="atf_procedure" /></div>
+      </>}
+    </div>
+  );
+}
+
 function Detail({ f, ps, setPs }: { f: Fluid; ps: boolean; setPs: (v: boolean) => void }) {
+  const v = useVehicle();
   return (
     <motion.div key={f.id} className="stack" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+      {v && <ForMyCar f={f} p={v} />}
       <div className="panel">
         <div className="fhead" style={{ color: f.color }}>
           <span className="ic"><CapIcon kind={f.cap} size={26} /></span>
@@ -131,12 +172,14 @@ function Detail({ f, ps, setPs }: { f: Fluid; ps: boolean; setPs: (v: boolean) =
 export function FluidsModule() {
   const [open, setOpen] = useState(false);
   const [sel, setSel] = useState<string | null>(null);
-  const [ps, setPs] = useState(true);
+  const v = useVehicle();
+  const [ps, setPs] = useState(() => !(v?.chassis?.steering ?? '').includes('electric'));
   const f = FLUIDS.find((x) => x.id === sel);
   const list = FLUIDS.filter((x) => x.id !== 'ps' || ps || sel === 'ps');
   return (
     <>
       <ModHead title="Что куда лить" lead="Шесть жидкостей, шесть разных крышек. Откройте капот и нажмите на номер — покажем, где это, как проверить и что лить." />
+      {v && <MyCarBadge p={v}>Данные вашей машины — в карточке каждой жидкости, с источником. {!ps && 'Руль с электроусилителем — бачка ГУР на схеме нет.'}</MyCarBadge>}
       <div className="split wide-aside">
         <div className="stack">
           <Stage label={<>FIG. 20 — <b>Моторный отсек</b> · вид сверху, перед машины снизу</>}>

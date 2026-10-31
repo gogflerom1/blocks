@@ -3,6 +3,8 @@ import { gearPath, useTicker } from '../../lib/anim';
 import { useInfo } from '../../lib/info';
 import { Callout, Seg, Stage } from '../../ui/kit';
 import { crownY, deckY, liftIn } from './Cylinder';
+import { useVehicle } from '../../lib/vehicle';
+import { MyCarBadge, SrcChip } from '../../ui/src';
 
 type C = { x: number; y: number; r: number; id: string };
 // по часовой стрелке на экране: коленвал → обводной ролик → распредвал вып. → распредвал вп. → натяжитель
@@ -47,7 +49,9 @@ const INFO: Record<string, [string, string]> = {
 
 export function Timing() {
   const info = useInfo();
-  const [kind, setKind] = useState<'belt' | 'chain'>('belt');
+  const v = useVehicle();
+  const td = v?.powertrain.engine?.timing_drive;
+  const [kind, setKind] = useState<'belt' | 'chain'>(td === 'chain' || td === 'belt' ? td : 'belt');
   const [interf, setInterf] = useState(true);
   const s = useRef({ crank: 30, cam: 15, omega: 220, mode: 'run' as 'run' | 'broken' | 'crash' | 'stop', bend: 0, off: 0 });
   const [, force] = useState(0);
@@ -90,6 +94,8 @@ export function Timing() {
   const vb = deck + liftIn(camTh) * maxLift;
 
   return (
+    <>
+    {v && td && <MyCarBadge p={v}>У {v.powertrain.engine?.code} привод ГРМ — {td === 'chain' ? 'цепь' : 'ремень'}. <SrcChip p={v} path="powertrain.engine.timing_drive" /> Встречаются ли клапаны с поршнями — в профиле не указано.</MyCarBadge>}
     <div className="split wide-aside">
       <Stage label={<>FIG. 04 — <b>Привод ГРМ</b> · {kind === 'belt' ? 'зубчатый ремень' : 'цепь'}</>} hint="нажмите на шкив">
         <svg viewBox="100 30 440 470" className="fig" style={{ maxHeight: 560 }}>
@@ -172,5 +178,6 @@ export function Timing() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -8,6 +8,8 @@ import { Automatic } from './Automatic';
 import { Robot } from './Robot';
 import { CVT } from './CVT';
 import { Drive, Differential } from './Drive';
+import { useVehicle } from '../../lib/vehicle';
+import { MyCarBadge, SrcChip } from '../../ui/src';
 
 const TABS = [
   { id: 'compare', label: 'Сравнение' },
@@ -45,7 +47,9 @@ function curves(id: BoxId) {
 }
 
 function Compare({ go }: { go: (t: T) => void }) {
-  const [sel, setSel] = useState<BoxId>('mt');
+  const v = useVehicle();
+  const mine: BoxId | null = v?.powertrain.transmission?.type?.includes('automatic') ? 'at' : null;
+  const [sel, setSel] = useState<BoxId>(mine ?? 'mt');
   const c = useMemo(() => curves(sel), [sel]);
   const b = BOXES.find((x) => x.id === sel)!;
   const W = 520, H = 120;
@@ -55,7 +59,7 @@ function Compare({ go }: { go: (t: T) => void }) {
       <div className="cmp-cards">
         {BOXES.map((x) => (
           <button key={x.id} className="bx" aria-pressed={sel === x.id} onClick={() => setSel(x.id)}>
-            <span className="eyebrow">{x.short}</span>
+            <span className="eyebrow">{x.short}{mine === x.id && <b style={{ color: 'var(--green)' }}> · ваша</b>}</span>
             <h3>{x.title}</h3>
             <p>{x.feel}</p>
           </button>
@@ -93,9 +97,11 @@ function Compare({ go }: { go: (t: T) => void }) {
 
 export function TransmissionModule({ sub }: { sub: string }) {
   const [tab, setTab] = useSubTab<T>('gearbox', TABS.map((t) => t.id), sub);
+  const v = useVehicle();
   return (
     <>
       <ModHead title="Коробка и привод" lead="Зачем нужны передачи, чем механика отличается от автомата, робота и вариатора, и как мощность доходит до колёс." />
+      {v?.powertrain.transmission && <MyCarBadge p={v}>Коробка {v.powertrain.transmission.model}: {v.powertrain.transmission.gears}-ступенчатый гидромеханический автомат, ATF {v.powertrain.transmission.atf_spec} <SrcChip p={v} path="powertrain.transmission.model" /> · привод {v.vehicle.drive === 'FWD' ? 'передний' : String(v.vehicle.drive)} <SrcChip p={v} path="vehicle.drive" /></MyCarBadge>}
       <Tabs tabs={TABS} value={tab} onChange={setTab} />
       {tab === 'compare' && <Compare go={setTab} />}
       {tab === 'manual' && <Manual />}

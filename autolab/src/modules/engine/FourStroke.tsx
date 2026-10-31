@@ -5,6 +5,8 @@ import { Fuel, PARTS, STROKES } from '../../content/engine';
 import { Cylinder, crownY, gasColor, pressure } from './Cylinder';
 import { Seg, Stage } from '../../ui/kit';
 import { Ico } from '../../ui/icons';
+import { useVehicle } from '../../lib/vehicle';
+import { Fact } from '../../ui/src';
 
 const SPEEDS = [0.25, 0.5, 1, 2] as const;
 const FIRING = [{ n: 1, off: 0 }, { n: 2, off: 540 }, { n: 3, off: 180 }, { n: 4, off: 360 }];
@@ -107,6 +109,8 @@ export function FourCylinders({ theta, fuel }: { theta: number; fuel: Fuel }) {
 }
 
 export function FourStroke() {
+  const v = useVehicle();
+  const eng = v?.powertrain.engine;
   const pb = usePlayback(20, 150);
   const [fuel, setFuel] = useState<Fuel>('petrol');
   const [sel, setSel] = useState<string | null>(null);
@@ -161,6 +165,16 @@ export function FourStroke() {
           <span className="eyebrow">Давление в цилиндре (упрощённая модель)</span>
           <PressureChart theta={pb.theta} fuel={fuel} />
         </div>
+        {v && eng && (
+          <div className="panel" style={{ borderColor: 'rgba(54,224,160,.35)' }}>
+            <span className="eyebrow" style={{ color: 'var(--green)' }}>Ваш мотор · {v.model} {v.generation}</span>
+            <Fact p={v} path="powertrain.engine.code" label="Двигатель" v={eng.code}>{eng.code} {eng.family}</Fact>
+            <Fact p={v} path="powertrain.engine.compression_ratio" label="Сжатие" v={eng.compression_ratio}>{eng.compression_ratio} : 1 {eng.compression_ratio === 10.5 && '— как на схеме'}</Fact>
+            <Fact p={v} path="powertrain.engine.bore_mm" label="Цилиндр" v={eng.bore_mm}>⌀ {eng.bore_mm} × ход {eng.stroke_mm} мм</Fact>
+            <Fact p={v} path="powertrain.engine.firing_order" label="Порядок работы" v={eng.firing_order} />
+            <Fact p={v} path="powertrain.engine.power_rpm" label="Макс. мощность" v={eng.power_rpm}>при {eng.power_rpm} об/мин — коленвал {Math.round((eng.power_rpm ?? 0) / 60)} об/с, каждый цилиндр делает {Math.round((eng.power_rpm ?? 0) / 120)} рабочих ходов в секунду</Fact>
+          </div>
+        )}
         <FourCylinders theta={pb.theta} fuel={fuel} />
         <div className="legend">
           <span><i style={{ background: '#8fd8ff' }} />воздух</span>

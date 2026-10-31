@@ -3,6 +3,7 @@ import { clamp, useTicker } from '../../lib/anim';
 import { Particles, Pt } from '../../lib/path';
 import { DRIVE } from '../../content/transmission';
 import { Callout, Chain, HoldButton, Range, Seg, Stage } from '../../ui/kit';
+import { useVehicle } from '../../lib/vehicle';
 
 type Layout = 'fwd' | 'rwd' | 'awd';
 const WF = 150, WRr = 490, XL = 92, XR = 308;
@@ -83,7 +84,9 @@ function CarTop({ layout, prog, spin }: { layout: Layout; prog: number; spin: nu
 }
 
 export function Drive() {
-  const [layout, setLayout] = useState<Layout>('fwd');
+  const v = useVehicle();
+  const mine = (v?.vehicle.drive as string | undefined)?.toLowerCase() as Layout | undefined;
+  const [layout, setLayout] = useState<Layout>(mine && ['fwd', 'rwd', 'awd'].includes(mine) ? mine : 'fwd');
   const [gas, setGas] = useState(false);
   const s = useRef({ prog: 0, spin: 0 });
   const [, force] = useState(0);
@@ -100,7 +103,7 @@ export function Drive() {
       <Stage label={<>FIG. 14 — <b>{d.title}</b> · вид сверху</>}>
         <CarTop layout={layout} prog={st.prog} spin={st.spin} />
         <div className="stage-ctl">
-          <Seg value={layout} onChange={(v) => { setLayout(v); s.current.prog = 0; }} options={[{ v: 'fwd', l: 'FWD' }, { v: 'rwd', l: 'RWD' }, { v: 'awd', l: 'AWD' }]} mono />
+          <Seg value={layout} onChange={(x) => { setLayout(x); s.current.prog = 0; }} options={(['fwd', 'rwd', 'awd'] as Layout[]).map((x) => ({ v: x, l: `${x.toUpperCase()}${x === mine ? ' · ваш' : ''}` }))} mono />
           <HoldButton className="btn primary" onHold={setGas}>Газ (держать)</HoldButton>
         </div>
       </Stage>

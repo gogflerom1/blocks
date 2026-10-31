@@ -4,14 +4,32 @@ import { BAY } from '../../content/underhood';
 import { go } from '../../lib/router';
 import { Callout, ModHead, SafetyTag, Stage } from '../../ui/kit';
 import { EngineBay } from './EngineBay';
+import { HOTSPOT_RU, useVehicle } from '../../lib/vehicle';
+import { MyCarBadge, SrcChip } from '../../ui/src';
 
 export function UnderhoodModule() {
+  const v = useVehicle();
+  const hs = v?.interactive_underhood?.hotspots ?? [];
+  // семантические id профиля → узлы типовой схемы
+  const MAP: Record<string, string> = { engine_oil_filler: 'oil', engine_oil_dipstick: 'oil', ecu: 'ecu', battery: 'battery', engine_air_filter: 'air', radiator_filler: 'radiator', coolant_expansion_tank: 'coolant', alternator: 'alt' };
   const [open, setOpen] = useState(true);
   const [sel, setSel] = useState<string | null>('battery');
   const it = BAY.find((x) => x.id === sel || (sel === 'dipstick' && x.id === 'oil'));
   return (
     <>
       <ModHead title="Под капотом" lead="Что здесь находится? Нажмите на любой узел — расскажем, зачем он, когда проверять и можно ли обслужить самому." />
+      {v && hs.length > 0 && (
+        <MyCarBadge p={v}>
+          По руководству по ремонту под капотом вашего {v.model}: {hs.length} узлов. <SrcChip p={v} path="interactive_underhood.hotspots" />
+          <div className="chips" style={{ marginTop: 8 }}>
+            {hs.map((h) => {
+              const id = MAP[h.id];
+              return <button key={h.id} className="chip" disabled={!id} aria-pressed={!!id && it?.id === id} style={{ ['--c' as string]: id ? '#36e0a0' : '#3a4b6c', minHeight: 32, opacity: id ? 1 : 0.6 }} onClick={() => { if (id) { setOpen(true); setSel(id); } }}>{h.reference_index}. {HOTSPOT_RU[h.id] ?? h.label}</button>;
+            })}
+          </div>
+          <span style={{ fontSize: 12.5 }}>Координат в профиле нет — узлы показаны в типовых местах схемы. Серые есть в профиле, но не нарисованы на схеме.</span>
+        </MyCarBadge>
+      )}
       <div className="split wide-aside">
         <div className="stack">
           <Stage label={<>FIG. 21 — <b>Что здесь находится</b> · типичная компоновка</>}>

@@ -3,11 +3,13 @@ import { CarScene, FlowName, Gear } from './CarScene';
 import { useCarScene } from './Home';
 import { Callout, HoldButton, ModHead, Seg } from '../../ui/kit';
 import { Gauge } from '../engine/Turbo';
+import { useVehicle } from '../../lib/vehicle';
 
 const FLOW_TITLE: Record<FlowName, string> = { gas: 'Нажат газ', brake: 'Нажат тормоз', steer: 'Поворот руля', start: 'Запуск двигателя', lights: 'Включён свет' };
 
 export function FreeModule() {
-  const { host, scene } = useCarScene();
+  const vh = useVehicle();
+  const { host, scene } = useCarScene({ body: vh?.vehicle.body as string | undefined });
   const [engine, setEngine] = useState(false);
   const [gear, setGear] = useState<Gear>('P');
   const [lights, setLights] = useState(0);
@@ -76,7 +78,7 @@ export function FreeModule() {
       <div className="split wide-aside">
         <div className="stage free-stage">
           <div ref={host} className="scene-host" />
-          <div className="stage-label">SIM — <b>Машина в разрезе</b></div>
+          <div className="stage-label">SIM — <b>{vh ? `${vh.make} ${vh.model} ${vh.generation ?? ''}` : 'Машина в разрезе'}</b></div>
           {!scene && <div className="overlay-msg"><div className="box"><h2>3D недоступно</h2><p className="muted">Браузер не дал WebGL. Попробуйте другой браузер.</p></div></div>}
           <div className="free-hud">
             <Gauge label="Скорость" value={h.speed} max={180} unit="км/ч" color="#36e0a0" digits={0} />

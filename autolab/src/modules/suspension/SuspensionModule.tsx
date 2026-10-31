@@ -4,6 +4,8 @@ import { useSubTab } from '../../lib/router';
 import { useInfo } from '../../lib/info';
 import { Particles, Pt } from '../../lib/path';
 import { Callout, ModHead, Range, Seg, Stage, Tabs } from '../../ui/kit';
+import { ru, useVehicle } from '../../lib/vehicle';
+import { SrcChip } from '../../ui/src';
 
 /* ── четверть автомобиля: кузов на пружине и амортизаторе, колесо на шине ── */
 const MS = 300, MU = 40, KT = 200000, V = 8.3;
@@ -164,7 +166,9 @@ const HOSE_R: Pt[] = [[580, 300], [580, 250], [390, 250], [390, 214]];
 
 function Steering() {
   const info = useInfo();
-  const [assist, setAssist] = useState<'hyd' | 'eps'>('eps');
+  const v = useVehicle();
+  const steer = v?.chassis?.steering ?? '';
+  const [assist, setAssist] = useState<'hyd' | 'eps'>(steer.includes('hydraulic') ? 'hyd' : 'eps');
   const [engine, setEngine] = useState(true);
   const [angle, setAngle] = useState(0);
   const drag = useRef<{ a: number } | null>(null);
@@ -249,6 +253,7 @@ function Steering() {
             <div className="bar"><i style={{ width: `${effort * 100}%`, background: effort > 0.5 ? 'var(--red)' : 'var(--green)' }} /></div>
           </div>
         </div>
+        {v && steer && <Callout kind="info">У вашего {v.model}: {ru(steer)}. <SrcChip p={v} path="chassis.steering" /></Callout>}
         {!works && <Callout kind="warn">ГУР без работающего мотора не помогает: насос крутится от ремня. Руль тяжёлый, но машина управляется.</Callout>}
         <Callout kind="info">Руль → вал → шестерня → рейка → тяги → колёса. Передаточное около 15:1: поворот руля на 15° поворачивает колёса примерно на 1°.</Callout>
       </div>

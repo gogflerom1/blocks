@@ -5,9 +5,10 @@ import { CarScene } from './CarScene';
 import { LAYERS, LayerId, SYSTEMS, SystemId } from '../../content/systems';
 import { MAIN_MENU, MODULES } from '../../content/nav';
 import { go } from '../../lib/router';
+import { ru, useVehicle } from '../../lib/vehicle';
 import { Ico } from '../../ui/icons';
 
-export function useCarScene(opts: { autoRotate?: boolean } = {}) {
+export function useCarScene(opts: { autoRotate?: boolean; body?: string } = {}) {
   const host = useRef<HTMLDivElement>(null);
   const [scene, setScene] = useState<CarScene | null>(null);
   useEffect(() => {
@@ -16,12 +17,13 @@ export function useCarScene(opts: { autoRotate?: boolean } = {}) {
     try { s = new CarScene(host.current, opts); setScene(s); } catch (e) { console.warn('WebGL недоступен', e); }
     return () => { s?.dispose(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [opts.body]);
   return { host, scene };
 }
 
 export function Home() {
-  const { host, scene } = useCarScene({ autoRotate: true });
+  const v = useVehicle();
+  const { host, scene } = useCarScene({ autoRotate: true, body: v?.vehicle.body as string | undefined });
   const dots = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [sel, setSel] = useState<SystemId | null>(null);
   const [explode, setExplode] = useState(false);
@@ -91,7 +93,7 @@ export function Home() {
       <section className="hero">
         <div className="hero-stage stage">
           <div ref={host} className="scene-host" />
-          <div className="stage-label">FIG. 01 — <b>Автомобиль в разрезе</b><span className="hide-sm"> · передний привод, бензин 1.6</span></div>
+          <div className="stage-label">FIG. 01 — <b>{v ? `${v.make} ${v.model} ${v.generation ?? ''}` : 'Автомобиль в разрезе'}</b><span className="hide-sm"> · {v ? `${ru(v.vehicle.body as string)}, ${v.powertrain.engine?.code ?? ''} ${v.powertrain.engine?.family ?? ''}, ${v.powertrain.transmission?.gears ?? ''}AT · модель условная` : 'передний привод, бензин 1.6'}</span></div>
           {!scene && (
             <div className="overlay-msg"><div className="box"><h2>3D недоступно</h2><p className="muted">Браузер не дал WebGL. Все разделы работают — выберите в меню.</p></div></div>
           )}

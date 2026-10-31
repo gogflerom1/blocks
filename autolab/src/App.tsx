@@ -4,6 +4,7 @@ import { go, useRoute } from './lib/router';
 import { InfoProvider } from './lib/info';
 import { MODULES } from './content/nav';
 import { Ico } from './ui/icons';
+import { useVehicle } from './lib/vehicle';
 import { Home } from './modules/home/Home';
 import { EngineModule } from './modules/engine/EngineModule';
 import { TransmissionModule } from './modules/transmission/TransmissionModule';
@@ -53,6 +54,7 @@ function Logo() {
 export function App() {
   const r = useRoute();
   const [nav, setNav] = useState(false);
+  const car = useVehicle();
   useEffect(() => { window.scrollTo({ top: 0 }); setNav(false); }, [r.mod]);
   const View = VIEWS[r.mod] ?? VIEWS.home;
   const m = MODULES.find((x) => x.id === r.mod);
@@ -70,6 +72,7 @@ export function App() {
             </div>
           )}
           <span className="spacer" />
+          {car && r.mod !== 'mycar' && <button className="car-chip" onClick={() => go('mycar')} title="Профиль машины"><Ico.car width={18} /><span>{car.model} {car.generation} {car.year}</span></button>}
           {r.mod !== 'home' && <button className="iconbtn" onClick={() => (history.length > 1 ? history.back() : go('home'))} aria-label="Назад"><Ico.back /></button>}
           <button className="iconbtn" onClick={() => setNav(true)} aria-label="Все разделы"><Ico.menu /></button>
         </header>
