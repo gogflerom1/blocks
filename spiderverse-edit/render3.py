@@ -638,6 +638,17 @@ def sc_king(T, step, rng):
         do.ellipse([gx - r, gy - r * .22, gx + r, gy + r * .22], outline=(8, 6, 14, al), width=int(14 * (1 - ph)) + 6)
         do.ellipse([gx - r, gy - r * .22, gx + r, gy + r * .22], outline=c + (al,), width=int(8 * (1 - ph)) + 2)
     comp(im, ov)
+    # конфетти
+    dd = ImageDraw.Draw(im)
+    if tf > .2:
+        for (x0_, sp_, ph_, sz, ci, rot_) in CONF:
+            y_ = ((ph_ * (H + 160) + tf * sp_) % (H + 160)) - 80
+            x_ = x0_ + 28 * math.sin(tf * 1.7 + ph_ * 6)
+            a_ = tf * rot_ + ph_ * 6
+            c, sn = math.cos(a_), math.sin(a_)
+            pts = [(x_ + c * sz - sn * sz * .5, y_ + sn * sz + c * sz * .5), (x_ - c * sz - sn * sz * .5, y_ - sn * sz + c * sz * .5),
+                   (x_ - c * sz + sn * sz * .5, y_ - sn * sz - c * sz * .5), (x_ + c * sz + sn * sz * .5, y_ + sn * sz - c * sz * .5)]
+            dd.polygon(pts, fill=CONF_COL[ci], outline=(8, 6, 14))
     # фигурка
     fg = fig_sprite()
     p = seg(tf, 0, .42)
@@ -661,21 +672,10 @@ def sc_king(T, step, rng):
             for j, (ox, oy, ph0) in enumerate(((-150, 20, 0), (140, 10, .33), (0, -80, .66), (-70, 90, .5))):
                 tw = (math.sin((tf * 3.2 + ph0 * 6.28)) * .5 + .5)
                 sparkle(dd, hx + ox, hy + oy, 14 + 40 * tw, (255, 255, 255) if j % 2 == 0 else (255, 236, 120))
-    # конфетти
-    dd = ImageDraw.Draw(im)
-    if tf > .2:
-        for (x0_, sp_, ph_, sz, ci, rot_) in CONF:
-            y_ = ((ph_ * (H + 160) + tf * sp_) % (H + 160)) - 80
-            x_ = x0_ + 28 * math.sin(tf * 1.7 + ph_ * 6)
-            a_ = tf * rot_ + ph_ * 6
-            c, sn = math.cos(a_), math.sin(a_)
-            pts = [(x_ + c * sz - sn * sz * .5, y_ + sn * sz + c * sz * .5), (x_ - c * sz - sn * sz * .5, y_ - sn * sz + c * sz * .5),
-                   (x_ - c * sz + sn * sz * .5, y_ - sn * sz - c * sz * .5), (x_ + c * sz + sn * sz * .5, y_ + sn * sz - c * sz * .5)]
-            dd.polygon(pts, fill=CONF_COL[ci], outline=(8, 6, 14))
     # плашка
     pb = seg(tf, .5, .8)
     if pb > 0:
-        paste(im, caption_sprite('67-КОРОЛЬ', 72, (255, 228, 77)), W / 2, 1005, eback(pb), -1.5)
+        paste(im, caption_sprite('67-КОРОЛЬ', 70, (255, 228, 77)), W / 2, 972, eback(pb), -1.5)
     # ирис-переход из заставки
     if t < .5:
         prev = sc_title(b34 - 1 / 60, step, rng)
