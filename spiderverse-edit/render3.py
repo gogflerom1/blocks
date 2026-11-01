@@ -9,20 +9,23 @@ from multiprocessing import Pool
 from PIL import Image, ImageDraw, ImageFont
 import render as R
 import track
-from render import (W, H, FPS, B, TOTAL, NFR, f32, clamp, seg, lerp, eio, eout, eexpo, eback, eel, to8, tof, lum,
+import figure
+from render import (W, H, FPS, B, f32, clamp, seg, lerp, eio, eout, eexpo, eback, eel, to8, tof, lum,
                     lerpcam, fit, project, view, grade, ink, halftone, chroma, chroma_radial, zoomblur, glitch,
                     grain, vignette, flash, edges, sv_grade, popmap, paper, inset, sfx_sprite, caption_sprite,
                     paste, star, speedlines, sense_lines, grid, PAPER, INKS, RIM, T_END, FR, FB, SW)
 
 b = lambda k: k * B
-b2, b8, b9, b11, b12, b15, b16, b20, b24, b27, b32 = [b(k) for k in (2, 8, 9, 11, 12, 15, 16, 20, 24, 27, 32)]
+TOTAL = 44 * B
+NFR = int(TOTAL * FPS)
+b2, b8, b9, b11, b12, b15, b16, b20, b24, b27, b32, b34 = [b(k) for k in (2, 8, 9, 11, 12, 15, 16, 20, 24, 27, 32, 34)]
 HOLD = 0.1
 # узлы времени: (выходное T, время исходника)
 KN = [(0, 0.0), (b2, 0.0), (b8, 2.90), (b9, 3.20), (b11, 3.80), (b11 + HOLD, 3.80), (b12, 3.88), (b15, 4.30),
       (b16, 4.58), (b20, 5.80), (b20 + .05, 5.80), (b24, 6.40)]
 T_PASS0 = b9 + (3.30 - 3.20) / (3.80 - 3.20) * (b11 - b9)
 EVENTS = {'off0': b16 + (4.85 - 4.58) / 1.22 * 4 * B, 'off1': b16 + (5.45 - 4.58) / 1.22 * 4 * B, 'ring': b16 + (5.35 - 4.58) / 1.22 * 4 * B, 'beat': B, 'walk': b2, 'pass0': T_PASS0, 'catch': b11, 'think': b12, 'release': b16, 'swish': b20,
-          'replay': b24, 'celeb': b27, 'end': b32, 'total': TOTAL}
+          'replay': b24, 'celeb': b27, 'end': b32, 'figure': b34, 'total': TOTAL}
 
 
 def ts_of(T):
@@ -75,15 +78,20 @@ def outline(text, size, color, wd=10, font=FR):
 
 @lru_cache(maxsize=8)
 def badge(text='67'):
-    ft = ImageFont.truetype(FR, 74)
-    bb = ft.getbbox(text)
-    tw, th = bb[2] - bb[0], bb[3] - bb[1]
-    w, h = tw + 80, th + 56
-    img = Image.new('RGBA', (w + 28, h + 28), (0, 0, 0, 0)); d = ImageDraw.Draw(img)
-    d.rounded_rectangle([14, 14, w + 14, h + 14], 18, fill=(0, 210, 255, 255))
-    d.rounded_rectangle([0, 0, w, h], 18, fill=(8, 6, 14, 255))
-    d.rounded_rectangle([7, 7, w - 7, h - 7], 13, fill=(255, 56, 120, 255))
-    d.text((40 - bb[0], 28 - bb[1]), text, font=ft, fill=(255, 255, 255, 255), stroke_width=3, stroke_fill=(8, 6, 14, 255))
+    f1 = ImageFont.truetype(FR, 74); f2 = ImageFont.truetype(FR, 31)
+    b1 = f1.getbbox(text); b2_ = f2.getbbox('КОРОЛЬ')
+    tw = max(b1[2] - b1[0], b2_[2] - b2_[0]); th1 = b1[3] - b1[1]; th2 = b2_[3] - b2_[1]
+    w, h = tw + 70, th1 + th2 + 78
+    img = Image.new('RGBA', (w + 28, h + 28 + 44), (0, 0, 0, 0)); d = ImageDraw.Draw(img)
+    oy = 44
+    d.rounded_rectangle([14, 14 + oy, w + 14, h + 14 + oy], 18, fill=(0, 210, 255, 255))
+    d.rounded_rectangle([0, oy, w, h + oy], 18, fill=(8, 6, 14, 255))
+    d.rounded_rectangle([7, 7 + oy, w - 7, h - 7 + oy], 13, fill=(255, 56, 120, 255))
+    d.text((w // 2 - (b1[2] - b1[0]) // 2 - b1[0], oy + 20 - b1[1]), text, font=f1, fill=(255, 255, 255, 255), stroke_width=3, stroke_fill=(8, 6, 14, 255))
+    d.rounded_rectangle([20, oy + th1 + 40, w - 20, oy + th1 + th2 + 62], 8, fill=(255, 228, 77, 255), outline=(8, 6, 14, 255), width=4)
+    d.text((w // 2 - (b2_[2] - b2_[0]) // 2 - b2_[0], oy + th1 + 51 - b2_[1]), 'КОРОЛЬ', font=f2, fill=(8, 6, 14, 255))
+    cr = figure.crown_sprite(96)
+    img.alpha_composite(cr, (w // 2 - 48, 0))
     return img
 
 
@@ -436,6 +444,19 @@ def sc_shot(T, step, rng):
     return im
 
 
+@lru_cache(maxsize=2)
+def king_combo():
+    n = chunk('67', 480); kk = chunk('КОРОЛЬ', 138, (255, 236, 60), (255, 70, 120), 12, 12)
+    cr = figure.crown_sprite(280)
+    cw = max(n.width, kk.width)
+    h = cr.height - 36 + n.height - 20 + kk.height
+    img = Image.new('RGBA', (cw, h), (0, 0, 0, 0))
+    img.alpha_composite(cr, ((cw - cr.width) // 2 + 20, 0))
+    img.alpha_composite(n, ((cw - n.width) // 2, cr.height - 36))
+    img.alpha_composite(kk, ((cw - kk.width) // 2, cr.height - 36 + n.height - 20))
+    return img
+
+
 def sc_score(T, step, rng):
     t = T - b20
     ts = ts_of(T); cam = cam_E(T)
@@ -458,10 +479,10 @@ def sc_score(T, step, rng):
     if p > 0:
         sc = lerp(3.2, 1.0, eback(p, 1.8)) if p < 1 else 1 + .02 * math.sin(t * 16)
         sq = 1 + .14 * math.sin(clamp(p, 0, 1) * math.pi) * (1 - p)
-        spr = chunk('67', 540)
+        spr = king_combo()
         s2 = spr.resize((max(1, int(spr.width * sc * sq)), max(1, int(spr.height * sc / sq))), Image.BICUBIC)
         jit = (rng.uniform(-5, 5), rng.uniform(-5, 5)) if t < .6 else (0, 0)
-        im.paste(s2, (int(1390 + jit[0] - s2.width / 2), int(560 + jit[1] - s2.height / 2)), s2)
+        im.paste(s2, (int(1420 + jit[0] - s2.width / 2), int(580 + jit[1] - s2.height / 2)), s2)
     q = seg(t, .12, .42)
     if q > 0:
         sx, sy = 440, 310
@@ -536,56 +557,138 @@ def sc_celeb(T, step, rng):
     return im
 
 
-_STILLS = {}
+@lru_cache(maxsize=1)
+def fig_sprite(): return figure.build()
 
 
-def stills():
-    if not _STILLS:
-        for k, ts_ in enumerate((3.80, 4.30, 4.58)):
-            hx, hy, fx, fy = track.hero(ts_)
-            cam = ((hx + fx) / 2 + 18, (hy + fy) / 2 - 8 + (-10 if k == 2 else 0), 2.5, 0)
-            a = view(ts_, lambda _: cam, 0, mb=False)
-            g = grade(a, 1.3, 1.25)
-            o = popmap(g) * .72 + g * .28
-            o = halftone(ink(o, .5), 8, .35)
-            _STILLS[k] = Image.fromarray(to8(chroma(o, 3))).resize((420, 236), Image.BICUBIC)
-    return _STILLS
+@lru_cache(maxsize=1)
+def title_spr(): return chunk('67-КОРОЛЬ', 215, (255, 236, 60), (255, 70, 120), 22, 22)
 
 
-def sc_end(T, step, rng):
+def sc_title(T, step, rng):
     t = T - b32
     pg = paper().copy()
-    big = chunk('67', 880, (255, 236, 60), (255, 70, 120), 26, 26)
-    pk = seg(t, 0, .38)
-    sc = lerp(2.8, 1.0, eback(pk, 1.6)) if pk < 1 else 1 + .014 * math.sin(t * 5)
+    spr = title_spr()
+    ring_burst(pg, W / 2, H / 2 + 60, t, 2.6, (255, 60, 130), 22)
+    pk = seg(t, 0, .3)
+    sc = lerp(2.6, 1.0, eback(pk, 1.6)) if pk < 1 else 1 + .012 * math.sin(t * 5)
     sq = 1 + .12 * math.sin(clamp(pk, 0, 1) * math.pi) * (1 - pk)
-    sp = big.resize((max(1, int(big.width * sc * sq)), max(1, int(big.height * sc / sq))), Image.BICUBIC)
-    pg.paste(sp, (int(W / 2 - sp.width / 2), int(H / 2 - sp.height / 2 - 120 + 18 * (1 - pk))), sp)
-    ring_burst(pg, W / 2, H / 2 - 60, t, 2.2, (255, 60, 130), 22)
-    # три момента №67: пасс, раздумье, бросок
-    st = stills()
-    for k, (cx, rot) in enumerate(((500, -2.6), (960, 1.6), (1420, -1.4))):
-        p = seg(t, .8 + k * B, .8 + k * B + .22)
-        if p <= 0: continue
-        pan = st[k]
-        fr = Image.new('RGBA', (pan.width + 24, pan.height + 24), (8, 6, 14, 255)); fr.paste(pan, (12, 12))
-        sc2 = eback(p, 1.7)
-        fr = fr.resize((max(1, int(fr.width * sc2)), max(1, int(fr.height * sc2))), Image.BICUBIC).rotate(rot + 6 * (1 - p), expand=True, resample=Image.BICUBIC)
-        sh = Image.new('RGBA', fr.size, (0, 0, 0, 0)); sh.paste((40, 10, 40, 120), (0, 0), fr)
-        cy = 905 + 30 * (1 - p)
-        pg.paste(sh, (int(cx + 14 - fr.width / 2), int(cy + 14 - fr.height / 2)), sh)
-        pg.paste(fr, (int(cx - fr.width / 2), int(cy - fr.height / 2)), fr)
-        if p > .6 and k < 2:
-            d = ImageDraw.Draw(pg)
-            ax = cx + 215
-            d.polygon([(ax, 905 - 18), (ax + 36, 905), (ax, 905 + 18)], fill=(255, 60, 130), outline=(8, 6, 14))
+    sp = spr.resize((max(1, int(spr.width * sc * sq)), max(1, int(spr.height * sc / sq))), Image.BICUBIC)
+    pg.paste(sp, (int(W / 2 - sp.width / 2), int(H / 2 + 60 - sp.height / 2)), sp)
+    cp = seg(t, .14, .46)
+    if cp > 0:
+        cr = figure.crown_sprite(330)
+        yy = lerp(-240, 300, eback(cp, 1.9)) if cp < 1 else 300
+        pg.paste(cr, (int(W / 2 - cr.width / 2 - 20), int(yy - cr.height / 2)), cr)
+        if cp >= 1:
+            ring_burst(pg, W / 2, 360, t - .46, 1.1, (255, 228, 77), 12)
     a = tof(pg)
     a = chroma(a, 10 * (1 - eout(seg(t, 0, .5))))
     a = flash(a, .8 * (1 - seg(t, 0, .06)))
-    zz = 1 + .03 * eio(seg(t, 0, TOTAL - b32))
-    imx = Image.fromarray(to8(grain(a, .02, step)))
-    nw, nh = int(W * zz), int(H * zz)
-    return imx.resize((nw, nh), Image.BICUBIC).crop(((nw - W) // 2, (nh - H) // 2, (nw - W) // 2 + W, (nh - H) // 2 + H))
+    return Image.fromarray(to8(grain(a, .02, step)))
+
+
+def sunburst(T, n=28):
+    cx, cy = W / 2, 560
+    im = Image.new('RGB', (W, H), (176, 24, 120)); d = ImageDraw.Draw(im)
+    rot = T * .16
+    for i in range(0, n, 2):
+        a0 = rot + i / n * 2 * math.pi; a1 = rot + (i + 1) / n * 2 * math.pi
+        d.polygon([(cx, cy), (cx + math.cos(a0) * 2600, cy + math.sin(a0) * 2600), (cx + math.cos(a1) * 2600, cy + math.sin(a1) * 2600)], fill=(255, 64, 140))
+    a = tof(im)
+    cov = np.clip(4.4 - grid(14, 45) + .5, 0, 1)
+    a *= 1 - .2 * cov[..., None]
+    return vignette(a, .55)
+
+
+def sparkle(d, x, y, r, col=(255, 255, 255)):
+    pts = []
+    for k in range(8):
+        a = k * math.pi / 4 - math.pi / 2
+        rr = r if k % 2 == 0 else r * .22
+        pts.append((x + math.cos(a) * rr, y + math.sin(a) * rr))
+    d.polygon(pts, fill=col, outline=(8, 6, 14))
+
+
+_CF = np.random.default_rng(5)
+CONF = [(_CF.uniform(0, W), _CF.uniform(80, 220), _CF.uniform(0, 1), _CF.uniform(10, 22), int(_CF.integers(0, 4)), _CF.uniform(-3, 3)) for _ in range(46)]
+CONF_COL = [(255, 228, 77), (0, 210, 255), (255, 255, 255), (255, 60, 130)]
+
+
+def sc_king(T, step, rng):
+    t = T - b34
+    im = Image.fromarray(to8(sunburst(T)))
+    d = ImageDraw.Draw(im)
+    u = (T / B) % 1
+    rr = 400 + 16 * (1 - u) ** 3
+    d.ellipse([W / 2 - rr - 12, 560 - rr - 12, W / 2 + rr + 12, 560 + rr + 12], fill=(12, 8, 20))
+    d.ellipse([W / 2 - rr, 560 - rr, W / 2 + rr, 560 + rr], fill=(255, 238, 140))
+    d.ellipse([W / 2 - rr * .8, 560 - rr * .8, W / 2 + rr * .8, 560 + rr * .8], fill=(255, 248, 196))
+    tf = t - .15
+    paste(im, outline('67', 980, (255, 60, 130), 18), W / 2, 560, 1 + .01 * math.sin(t * 3), 0, .6 * eout(seg(tf, .1, .5)))
+    # круги под ногами в такт
+    ov = overlay(); do = ImageDraw.Draw(ov)
+    gx, gy = W / 2, 935
+    do.ellipse([gx - 250, gy - 40, gx + 250, gy + 40], fill=(255, 60, 130, 130))
+    do.ellipse([gx - 170, gy - 27, gx + 170, gy + 27], fill=(255, 228, 77, 170))
+    for k in range(3):
+        ph = ((T / B) + k / 3) % 1
+        r = 170 + 360 * eout(ph); al = int(255 * (1 - ph))
+        c = ((255, 228, 77), (255, 60, 130))[k % 2]
+        do.ellipse([gx - r, gy - r * .22, gx + r, gy + r * .22], outline=(8, 6, 14, al), width=int(14 * (1 - ph)) + 6)
+        do.ellipse([gx - r, gy - r * .22, gx + r, gy + r * .22], outline=c + (al,), width=int(8 * (1 - ph)) + 2)
+    comp(im, ov)
+    # фигурка
+    fg = fig_sprite()
+    p = seg(tf, 0, .42)
+    if p > 0:
+        scl = .72 * (1 + .014 * (1 - u) ** 3)
+        sx_ = 1 + .14 * math.sin(clamp(p, 0, 1) * math.pi) * (1 - p) * -1
+        sy_ = 1 + .14 * math.sin(clamp(p, 0, 1) * math.pi) * (1 - p)
+        w2, h2 = int(fg.width * scl * sx_), int(fg.height * scl * sy_)
+        f2 = fg.resize((max(1, w2), max(1, h2)), Image.BICUBIC)
+        bob = 7 * math.sin(max(0, tf) * 2 * math.pi / (2 * B)) if p >= 1 else 0
+        rot = 1.3 * math.sin(max(0, tf) * 2 * math.pi / (4 * B)) if p >= 1 else 0
+        f2 = f2.rotate(rot, expand=True, resample=Image.BICUBIC)
+        yoff = lerp(700, 0, eback(p, 1.8))
+        x0 = int(W / 2 - f2.width / 2)
+        y0 = int(955 - f2.height + bob + yoff)
+        im.paste(f2, (x0, y0), f2)
+        # блёстки на короне
+        if p >= 1:
+            hx, hy = W / 2, 955 - fg.height * scl + 20 * scl + bob
+            dd = ImageDraw.Draw(im)
+            for j, (ox, oy, ph0) in enumerate(((-150, 20, 0), (140, 10, .33), (0, -80, .66), (-70, 90, .5))):
+                tw = (math.sin((tf * 3.2 + ph0 * 6.28)) * .5 + .5)
+                sparkle(dd, hx + ox, hy + oy, 14 + 40 * tw, (255, 255, 255) if j % 2 == 0 else (255, 236, 120))
+    # конфетти
+    dd = ImageDraw.Draw(im)
+    if tf > .2:
+        for (x0_, sp_, ph_, sz, ci, rot_) in CONF:
+            y_ = ((ph_ * (H + 160) + tf * sp_) % (H + 160)) - 80
+            x_ = x0_ + 28 * math.sin(tf * 1.7 + ph_ * 6)
+            a_ = tf * rot_ + ph_ * 6
+            c, sn = math.cos(a_), math.sin(a_)
+            pts = [(x_ + c * sz - sn * sz * .5, y_ + sn * sz + c * sz * .5), (x_ - c * sz - sn * sz * .5, y_ - sn * sz + c * sz * .5),
+                   (x_ - c * sz + sn * sz * .5, y_ - sn * sz - c * sz * .5), (x_ + c * sz + sn * sz * .5, y_ + sn * sz - c * sz * .5)]
+            dd.polygon(pts, fill=CONF_COL[ci], outline=(8, 6, 14))
+    # плашка
+    pb = seg(tf, .5, .8)
+    if pb > 0:
+        paste(im, caption_sprite('67-КОРОЛЬ', 72, (255, 228, 77)), W / 2, 1005, eback(pb), -1.5)
+    # ирис-переход из заставки
+    if t < .5:
+        prev = sc_title(b34 - 1 / 60, step, rng)
+        r = 1500 * eexpo(seg(t, 0, .45))
+        m = Image.new('L', (W, H), 0); ImageDraw.Draw(m).ellipse([W / 2 - r, 560 - r, W / 2 + r, 560 + r], fill=255)
+        out = prev.copy(); out.paste(im, (0, 0), m)
+        ImageDraw.Draw(out).ellipse([W / 2 - r, 560 - r, W / 2 + r, 560 + r], outline=(8, 6, 14), width=18)
+        im = out
+    a = tof(im)
+    a = chroma(a, 6 * (1 - eout(seg(t, 0, .6))))
+    fade = seg(T, TOTAL - .55, TOTAL)
+    if fade > 0: a = a * (1 - fade) + np.array([.05, .03, .08], f32) * fade
+    return Image.fromarray(to8(grain(a, .015, step)))
 
 
 def frame(i):
@@ -600,7 +703,8 @@ def frame(i):
     if T < b24: return sc_score(T, step, rng)
     if T < b27: return sc_diagram(T, step, rng)
     if T < b32: return sc_celeb(T, step, rng)
-    return sc_end(T, step, rng)
+    if T < b34: return sc_title(T, step, rng)
+    return sc_king(T, step, rng)
 
 
 def work(i):

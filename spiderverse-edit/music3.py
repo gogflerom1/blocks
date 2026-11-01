@@ -316,20 +316,39 @@ for o in (0, 1, 2, 3):
 riff = [(0, 81), (.5, 79), (.75, 76), (1.5, 74), (2, 76), (2.5, 72), (3, 74), (3.5, 69)]
 for b0, sh in ((28, 0), (30, -4)):
     for o, m in riff: add(lead, pluck(m + (sh if o >= 2 else 0) - 12, .32, 7000), bt(b0 + o), .6)
-# b32: финал
-te = EV['end']
-add(sfx, sub_boom(3.0, 200, 32, .9), te)
-add(sfx, impact(2.8), te, 1.0)
-add(drums, crash(3.2), te, .55)
+# b32: заставка «67-КОРОЛЬ»
+te = EV['end']; tf = EV['figure']
+add(sfx, sub_boom(2.0, 200, 32, .9), te)
+add(sfx, impact(2.0), te, .9)
+add(drums, crash(2.4), te, .5)
 K(te, 1.0)
-fin = 0
-for m in [33, 45, 52, 57, 60, 64, 69]:
-    fin = fin + osc_saw(mtof(m), bt(6), 28, .003) + osc_saw(mtof(m), bt(6), 28, -.003)
-add(syn, fftfilt(fin * env(len(fin), .005, 1.7, 0, .5, bt(6) - .5), 60, 5000) * .17, te)
-add(bass, bass808(33, bt(4), 45, 3.6), te, 1.1)
-add(rees, reese(33, bt(5), 0), te, .5)
-tb = tt(1.6)
-add(lead, sum(np.sin(2 * np.pi * mtof(m) * tb) * np.exp(-tb * 3) for m in (81, 88)), te + bt(2), .22)
+add(bass, bass808(33, bt(2), 45, 3.6), te, 1.0)
+# корона падает: звон металла
+tb = tt(.9)
+clang = sum(np.sin(2 * np.pi * f * tb + 1.5 * np.sin(2 * np.pi * f * 1.4 * tb) * np.exp(-tb * 9)) * np.exp(-tb * 7) for f in (1318, 1760, 2093, 2637))
+add(sfx, clang, te + .32, .12)
+add(sfx, whoosh(.3, False, .4), te + .08)
+# b34: фигурка — фанфара
+add(sfx, whoosh(.4, True, .5), tf - .35)
+fan = 0
+for m in (45, 57, 61, 64, 69, 73):
+    fan = fan + osc_saw(mtof(m), 2.2, 26, .003) + osc_saw(mtof(m), 2.2, 26, -.003)
+add(syn, fftfilt(fan * env(len(fan), .01, 1.1, .3, .3, 1.9), 150, 6500) * .22, tf)
+for o, m in ((0, 76), (.5, 76), (1, 81), (2, 85)):
+    add(lead, pluck(m, .6, 7000), tf + bt(o), .8)
+for i, m in enumerate((93, 97, 100, 105, 100, 97, 93, 105)):
+    tb = tt(.5); add(sfx, np.sin(2 * np.pi * mtof(m) * tb) * np.exp(-tb * 9), tf + .1 + i * B / 2, .1)
+add(sfx, sub_boom(1.6, 160, 38, .9), tf)
+add(sfx, impact(1.6), tf, .7)
+K(tf, 1.0); CL(tf, .9); add(drums, crash(2.2), tf, .4)
+# b36–b44: фигурка стоит — полный грув с басом
+drop_bar(36, 33, Am, 3.5)
+drop_bar(40, 29, F, 3.5)
+riff = [(0, 81), (.5, 79), (.75, 76), (1.5, 74), (2, 76), (2.5, 72), (3, 74), (3.5, 69)]
+for b0, sh in ((36, 0), (40, -4)):
+    for o, m in riff: add(lead, pluck(m + (sh if o >= 2 else 0) - 12, .32, 7000), bt(b0 + o), .55)
+add(sfx, sub_boom(2.0, 150, 34, .7), bt(40))
+add(sfx, crash(1.6), bt(40), .15)
 
 # ---------------- живой звук зала ----------------
 raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', sys.argv[1], '-ac', '2', '-ar', str(SR), '-f', 's16le', '-'], capture_output=True, check=True).stdout
@@ -365,7 +384,7 @@ mix += np.stack([fftfilt(Lw, hi=130), fftfilt(Rw, hi=130)], 1) * .06  # лёгк
 mix += room
 mix = np.tanh(mix * 1.25) / np.tanh(1.25)
 mix *= .89 / np.abs(mix).max()
-fo = int(.06 * SR); mix[-fo:] *= np.linspace(1, 0, fo)[:, None]
+fo = int(.55 * SR); mix[-fo:] *= np.linspace(1, 0, fo)[:, None] ** 1.5
 out = sys.argv[2]
 with wave.open(out, 'wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
