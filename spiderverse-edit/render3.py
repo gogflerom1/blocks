@@ -126,17 +126,17 @@ def ripples(ov, cam, ts, T, strength=1.0, col=((255, 228, 77), (255, 60, 130))):
         d.ellipse([X - r, Y - r * .3, X + r, Y + r * .3], outline=c + (al,), width=wd)
 
 
-def tag(im, cam, ts, T, t_in, scale=1.0, dy=0):
+def tag(im, cam, ts, T, t_in, scale=1.0, dy=0, dx=30):
     p = seg(T, t_in, t_in + .22)
     if p <= 0: return
     hx, hy, _, _ = track.hero(ts)
     s = S(cam); X, Y = project(cam, hx, hy)
     bob = math.sin(T / B * math.pi * 2) * 5
-    ty = max(110, Y - 150 * (s / 3.4) - 70 + bob + dy)
+    ty = max(110, Y - 105 * (s / 3.4) - 50 + bob + dy)
     d = ImageDraw.Draw(im)
-    d.line([(X, Y - 18 * s / 3), (X + 18, ty + 40)], fill=(8, 6, 14), width=10)
-    d.line([(X, Y - 18 * s / 3), (X + 18, ty + 40)], fill=(255, 228, 77), width=4)
-    paste(im, badge(), X + 30, ty, eback(p) * scale, -5 + 3 * math.sin(T / B * math.pi))
+    d.line([(X, Y - 18 * s / 3), (X + dx * .6, ty + 40)], fill=(8, 6, 14), width=10)
+    d.line([(X, Y - 18 * s / 3), (X + dx * .6, ty + 40)], fill=(255, 228, 77), width=4)
+    paste(im, badge(), X + dx, ty, eback(p) * scale, -5 + 3 * math.sin(T / B * math.pi))
 
 
 def thought(im, cam, ts, T, k=1.0, dx=64, dy=-60):
@@ -256,9 +256,9 @@ def cam_C(T):
 def cam_D(T):
     if T < b16:
         p = eio(seg(T, b15, b16))
-        return (lerp(452, 446, p), lerp(184, 150, p), lerp(2.25, 2.7, p), lerp(1.2, 0, p))
-    p = eio(seg(T, b16 + .05, b20 - .1))
-    a = (446, 150, 2.7, 0.0)
+        return (lerp(452, 446, p), lerp(168, 190, p), lerp(2.05, 2.3, p), lerp(1.2, 0, p))
+    p = eio(seg(T, b16 + .32, b20 - .12))
+    a = (446, 190, 2.3, 0.0)
     c = (RIM[0] - 6, RIM[1] + 36, 2.55, 1.0)
     return lerpcam(a, c, p)
 
@@ -358,7 +358,7 @@ def sc_think(T, step, rng):
     X, Y = project(cam, hx, hy)
     sense_lines(ImageDraw.Draw(im), X, Y - 20, 1.25 * (S(cam) / 4.5), rng, eback(seg(T, b12, b12 + .2)) * (1 if u < .35 else .25))
     thought(im, cam, ts, T, seg(T, b12 + .1, b12 + .45))
-    tag(im, cam, ts, T, 0, 1.0, dy=-20)
+    tag(im, cam, ts, T, 0, 1.0, dy=-10, dx=-95)
     return im
 
 
@@ -536,41 +536,56 @@ def sc_celeb(T, step, rng):
     return im
 
 
+_STILLS = {}
+
+
+def stills():
+    if not _STILLS:
+        for k, ts_ in enumerate((3.80, 4.30, 4.58)):
+            hx, hy, fx, fy = track.hero(ts_)
+            cam = ((hx + fx) / 2 + 18, (hy + fy) / 2 - 8 + (-10 if k == 2 else 0), 2.5, 0)
+            a = view(ts_, lambda _: cam, 0, mb=False)
+            g = grade(a, 1.3, 1.25)
+            o = popmap(g) * .72 + g * .28
+            o = halftone(ink(o, .5), 8, .35)
+            _STILLS[k] = Image.fromarray(to8(chroma(o, 3))).resize((420, 236), Image.BICUBIC)
+    return _STILLS
+
+
 def sc_end(T, step, rng):
     t = T - b32
-    cam = (434, 215, 1.9, 0)
-    a = view(4.55, lambda _: cam, T, mb=False)
-    g = grade(a, 1.3, 1.25)
-    o = popmap(g) * .8 + g * .2
-    o = ink(o, .5); o = halftone(o, 10, .5)
-    o = o * (1 - .25 * seg(t, 0, 2.5))
-    im = Image.fromarray(to8(chroma(o, 3)))
     pg = paper().copy()
-    # фото-панель
-    p = eout(seg(t, 0, .3))
-    panel = im.resize((int(W * .28), int(H * .28)), Image.BICUBIC)
-    fr = Image.new('RGBA', (panel.width + 28, panel.height + 28), (8, 6, 14, 255)); fr.paste(panel, (14, 14))
-    fr = fr.rotate(-3.2, expand=True, resample=Image.BICUBIC)
-    sh = Image.new('RGBA', fr.size, (0, 0, 0, 0)); sh.paste((40, 10, 40, 120), (0, 0), fr)
-    # огромное 67 — с точечной заливкой
     big = chunk('67', 880, (255, 236, 60), (255, 70, 120), 26, 26)
     pk = seg(t, 0, .38)
-    sc = lerp(2.8, 1.0, eback(pk, 1.6)) if pk < 1 else 1 + .012 * math.sin(t * 5)
+    sc = lerp(2.8, 1.0, eback(pk, 1.6)) if pk < 1 else 1 + .014 * math.sin(t * 5)
     sq = 1 + .12 * math.sin(clamp(pk, 0, 1) * math.pi) * (1 - pk)
     sp = big.resize((max(1, int(big.width * sc * sq)), max(1, int(big.height * sc / sq))), Image.BICUBIC)
-    pg.paste(sp, (int(W / 2 - sp.width / 2), int(H / 2 - sp.height / 2 - 110 + 18 * (1 - pk))), sp)
-    pg.paste(sh, (int(1610 + 14 - fr.width / 2), int(895 + 14 - fr.height / 2)), sh)
-    pg.paste(fr, (int(1610 - fr.width / 2), int(895 - fr.height / 2)), fr)
-    ov = overlay()
-    ring_burst(pg, W / 2, H / 2 + 20, t, 2.2, (255, 60, 130), 22)
+    pg.paste(sp, (int(W / 2 - sp.width / 2), int(H / 2 - sp.height / 2 - 120 + 18 * (1 - pk))), sp)
+    ring_burst(pg, W / 2, H / 2 - 60, t, 2.2, (255, 60, 130), 22)
+    # три момента №67: пасс, раздумье, бросок
+    st = stills()
+    for k, (cx, rot) in enumerate(((500, -2.6), (960, 1.6), (1420, -1.4))):
+        p = seg(t, .8 + k * B, .8 + k * B + .22)
+        if p <= 0: continue
+        pan = st[k]
+        fr = Image.new('RGBA', (pan.width + 24, pan.height + 24), (8, 6, 14, 255)); fr.paste(pan, (12, 12))
+        sc2 = eback(p, 1.7)
+        fr = fr.resize((max(1, int(fr.width * sc2)), max(1, int(fr.height * sc2))), Image.BICUBIC).rotate(rot + 6 * (1 - p), expand=True, resample=Image.BICUBIC)
+        sh = Image.new('RGBA', fr.size, (0, 0, 0, 0)); sh.paste((40, 10, 40, 120), (0, 0), fr)
+        cy = 905 + 30 * (1 - p)
+        pg.paste(sh, (int(cx + 14 - fr.width / 2), int(cy + 14 - fr.height / 2)), sh)
+        pg.paste(fr, (int(cx - fr.width / 2), int(cy - fr.height / 2)), fr)
+        if p > .6 and k < 2:
+            d = ImageDraw.Draw(pg)
+            ax = cx + 215
+            d.polygon([(ax, 905 - 18), (ax + 36, 905), (ax, 905 + 18)], fill=(255, 60, 130), outline=(8, 6, 14))
     a = tof(pg)
     a = chroma(a, 10 * (1 - eout(seg(t, 0, .5))))
     a = flash(a, .8 * (1 - seg(t, 0, .06)))
-    zz = 1 + .035 * eio(seg(t, 0, TOTAL - b32))
+    zz = 1 + .03 * eio(seg(t, 0, TOTAL - b32))
     imx = Image.fromarray(to8(grain(a, .02, step)))
     nw, nh = int(W * zz), int(H * zz)
-    imx = imx.resize((nw, nh), Image.BICUBIC).crop(((nw - W) // 2, (nh - H) // 2, (nw - W) // 2 + W, (nh - H) // 2 + H))
-    return imx
+    return imx.resize((nw, nh), Image.BICUBIC).crop(((nw - W) // 2, (nh - H) // 2, (nw - W) // 2 + W, (nh - H) // 2 + H))
 
 
 def frame(i):
