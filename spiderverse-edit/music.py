@@ -164,17 +164,17 @@ def groove_bar(b0, chord_root, chord, full=True, hats16=False):
     add(syn, pad(chord, bt(4)), bt(b0))
 
 
-# bar0: титр
-add(syn, pad(Am, bt(3)) * .7, 0)
-for k in range(3):
-    add(sfx, impact(1.2), bt(k), .55); add(syn, stab([45, 57, 60, 64]), bt(k), 1.0)
-crk = np.zeros(int(bt(4) * SR)); idx = rng.integers(0, len(crk), 260); crk[idx] = rng.normal(0, .5, len(idx))
-add(sfx, fftfilt(crk, 1500, 9000) + fftfilt(rng.normal(0, .01, len(crk)), 300, 3000), 0, .5)
-# перемотка (бит 3)
-t = tt(bt(1))
-rew = np.sin(2 * np.pi * np.cumsum(2400 * np.exp(-t * 3) + 300 * np.sin(t * 60)) / SR) * .25
-rew += sweep_filter(rng.normal(0, .5, len(t)), lambda x: 6000 * np.exp(-x * 3) + 300, 'bp')
-add(sfx, rew * np.linspace(.4, 1, len(t)), bt(3), .5)
+# bar0: «печать» кадра -> вход бита на бит 2
+p0 = pad(Am, bt(4))
+add(syn, sweep_filter(p0, lambda x: 300 * (3000 / 300) ** min(1, x / bt(2))), 0, .9)
+crk = np.zeros(int(bt(4) * SR)); idx = rng.integers(0, len(crk), 200); crk[idx] = rng.normal(0, .5, len(idx))
+add(sfx, fftfilt(crk, 1500, 9000), 0, .4)
+tp = tt(bt(2))
+add(sfx, sweep_filter(rng.normal(0, 1, len(tp)), lambda x: 600 * (9000 / 600) ** (x / bt(2)), 'bp') * (tp / bt(2)) ** 2, 0, .25)
+K(2); S(3, .55)
+for k in np.arange(2, 4, .5): Hh(k, .18)
+add(bass, bass808(45, bt(1.6)), bt(2))
+for o, m in [(2, 69), (2.75, 72), (3.25, 76)]: add(lead, pluck(m, .35, 3000), bt(o), .45)
 
 # bars1-2: грув
 groove_bar(4, 45, Am, hats16=False)
@@ -197,10 +197,6 @@ add(sfx, impact(.8), bt(13.5), .35)
 for k in np.arange(15, 16, 1 / 8): S(k, .15 + .5 * (k - 15))
 
 # bar4: полёт — THWIP, свип, райзер
-tw = tt(.16)
-thwip = np.sin(2 * np.pi * np.cumsum(1900 * np.exp(-tw * 14) + 300) / SR) * np.exp(-tw * 14) + fftfilt(rng.normal(0, 1, len(tw)), 2000, 9000) * np.exp(-tw * 30) * .6
-add(sfx, thwip, bt(16), .45)
-add(drums, kick(.9), bt(16))
 tw = tt(.6)
 wh = sweep_filter(rng.normal(0, 1, len(tw)), lambda x: 400 + 4000 * np.sin(np.pi * min(1, x / .6)), 'bp') * np.sin(np.pi * np.minimum(1, tw / .6))
 add(sfx, wh, bt(16) + .12, .45)
@@ -233,27 +229,22 @@ riff = [(0, 81), (.5, 79), (.75, 76), (1.5, 74), (2, 76), (2.5, 72), (3, 74), (3
 for b0, sh in ((20, 0), (24, -4), (28, 3)):
     for o, m in riff:
         add(lead, pluck(m + (sh if o >= 2 else 0) - 12, .32, 7000), bt(b0 + o), .75)
-# удары панелей мультивселенной
-for k in range(4):
-    tw = tt(.3)
-    wk = np.tanh((np.sin(2 * np.pi * np.cumsum(90 + 200 * np.exp(-tw * 40)) / SR) * np.exp(-tw * 14) + fftfilt(rng.normal(0, 1, len(tw)), 800, 7000) * np.exp(-tw * 25) * .7) * 1.5)
-    add(sfx, wk, bt(22 + k), .5)
-# разлёт панелей
-tw = tt(.4)
-add(sfx, sweep_filter(rng.normal(0, 1, len(tw)), lambda x: 5000 - 9000 * x, 'bp') * np.sin(np.pi * tw / .4), bt(26), .4)
-
-# bar8: страница комикса
+# слоу-мо повтор: обратный свиш и возврат
 tw = tt(.5)
-add(sfx, sweep_filter(rng.normal(0, 1, len(tw)), lambda x: 900 + 5000 * x, 'bp') * np.sin(np.pi * tw / .5), bt(32) - .1, .45)
-K(32); add(bass, bass808(45, bt(1.9)), bt(32)); add(syn, pad(Am, bt(2)) * .8, bt(32))
-for k in (33, 34): add(sfx, impact(.7), bt(k), .4); S(k, .5)
+add(sfx, fftfilt(rng.normal(0, 1, len(tw)), 2500, 11000)[::-1] * np.sin(np.pi * tw / .5) ** 2, bt(22) - .1, .3)
+tw = tt(.35)
+add(sfx, sweep_filter(rng.normal(0, 1, len(tw)), lambda x: 1500 + 6000 * x, 'bp') * np.sin(np.pi * tw / .35), bt(26) - .05, .3)
+
+# bar8: финальный стоп-кадр
 fin = 0
 for m in [33, 45, 52, 57, 60, 64, 69]:
-    fin = fin + osc_saw(mtof(m), bt(4.2), 28, .003) + osc_saw(mtof(m), bt(4.2), 28, -.003)
-fin = fftfilt(fin * env(len(fin), .005, 1.2, 0, .3, bt(4.2) - .3), 60, 5000) * .16
-add(syn, fin, bt(34)); add(drums, kick(1.1), bt(34)); add(drums, crash(3), bt(34), .4); add(sfx, impact(2.4), bt(34), .7)
-for k in range(22):
-    tc = tt(.02); add(sfx, fftfilt(rng.normal(0, 1, len(tc)), 2000, 9000) * np.exp(-tc * 200), bt(35) + k * .6 / 22, .25)
+    fin = fin + osc_saw(mtof(m), bt(6.2), 28, .003) + osc_saw(mtof(m), bt(6.2), 28, -.003)
+fin = fftfilt(fin * env(len(fin), .005, 1.6, 0, .4, bt(6.2) - .4), 60, 5000) * .16
+add(syn, fin, bt(32)); add(drums, kick(1.1), bt(32)); add(drums, crash(3), bt(32), .4); add(sfx, impact(2.4), bt(32), .7)
+add(bass, bass808(33, bt(3)), bt(32), .8)
+tb = tt(1.5)
+bell = sum(np.sin(2 * np.pi * mtof(m) * tb) * np.exp(-tb * 3) for m in (81, 88))
+add(lead, bell, bt(34), .25)
 
 # ---------- живой звук ----------
 src = sys.argv[1]
@@ -268,7 +259,7 @@ def place(s0, s1, t0, gain, speed=1.0, fade=.15):
     e = np.ones(len(seg)); nf = int(fade * SR); e[:nf] = np.linspace(0, 1, nf); e[-nf:] = np.linspace(1, 0, nf)
     i0 = int(t0 * SR); n = min(len(seg), N - i0)
     room[i0:i0 + n] += seg[:n] * e[:n, None] * gain
-place(0, 4.3, bt(4), .55, 1.254)
+place(0, 4.3, bt(2), .5, 1.0)
 place(5.72, 8.36, bt(20) - .08, .95, fade=.05)
 place(5.95, 8.36, bt(26), .55, fade=.4)
 
