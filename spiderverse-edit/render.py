@@ -22,7 +22,7 @@ T_REL, T_SWISH, T_END = 4.58, 5.80, 8.366
 RIM = (555.0, 66.0)
 HEAD_SENSE = (436.0, 218.0)
 BALL_REL = (452.0, 110.0)
-TAG67 = (426.0, 185.0)
+TAG67 = (430.0, 222.0)
 
 # сцены (сек вывода)
 S1, S2, S3, S4, S5, S6, S7, S8 = [k * B for k in (0, 4, 12, 16, 20, 22, 26, 32)]
@@ -506,9 +506,9 @@ def sc_game(T, step, rng):
     if p > 0:
         x, y = project(cam_game(T), *TAG67)
         d = ImageDraw.Draw(im)
-        ty = y - 170
-        d.line([(x, y - 30), (x + 40, ty + 40)], fill=(0, 0, 0), width=10)
-        d.line([(x, y - 30), (x + 40, ty + 40)], fill=(255, 228, 77), width=4)
+        ty = y - 190
+        d.line([(x, y - 8), (x + 40, ty + 40)], fill=(0, 0, 0), width=10)
+        d.line([(x, y - 8), (x + 40, ty + 40)], fill=(255, 228, 77), width=4)
         paste(im, caption_sprite('№67', 44, (255, 60, 90), (255, 255, 255)), x + 60, ty, eback(p), -4)
     return im
 
@@ -559,16 +559,6 @@ def sc_flight(T, step, rng):
     if hold:
         x, y = project(cam, *BALL_REL)
         paste(im, sfx_sprite('THWIP!', 150), x + 260, y - 80, eback(seg(T, S4, S4 + .1)), 10)
-    # пунктир траектории
-    vis = seg(T, S4 + REL_HOLD, S4 + REL_HOLD + .45) * (1 - seg(T, S5 - .55, S5 - .3))
-    if vis > 0:
-        d = ImageDraw.Draw(im)
-        n = 26
-        for k in range(int(n * vis)):
-            if k % 2: continue
-            x0, y0 = project(cam, *parabola(k / n)); x1, y1 = project(cam, *parabola((k + 1) / n))
-            d.line([(x0, y0), (x1, y1)], fill=(0, 0, 0), width=16)
-            d.line([(x0, y0), (x1, y1)], fill=(255, 228, 77), width=8)
     if T > S5 - .5:
         d = ImageDraw.Draw(im)
         x, y = project(cam, *RIM)
