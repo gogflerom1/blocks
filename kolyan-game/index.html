@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Kolyan Escape</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14213a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Rubik:wght@500;700;800&display=swap">
+<style>
+/* Layout: full-bleed WebGL canvas; HUD hugs safe-area edges; menus are centered chalkboard panels. */
+:root {
+  --ink: #0f1626;
+  --chalk: #f4f1e6;
+  --board: #24443a;
+  --board-2: #1b3329;
+  --tee: #2a4fe0;
+  --yellow: #ffd23f;
+  --danger: #ff3b3b;
+  --glass: rgba(15, 22, 38, 0.55);
+  --glass-2: rgba(255, 255, 255, 0.16);
+  --display: 'Rubik Mono One', 'Arial Black', Impact, system-ui, sans-serif;
+  --body: 'Rubik', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --sl: env(safe-area-inset-left, 0px);
+  --sr: env(safe-area-inset-right, 0px);
+  --st: env(safe-area-inset-top, 0px);
+  --sb: env(safe-area-inset-bottom, 0px);
+  --btn: clamp(58px, 15vh, 92px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: var(--ink); color: var(--chalk);
+  font-family: var(--body); touch-action: none; user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none; overscroll-behavior: none; position: fixed; inset: 0; width: 100%;
+}
+canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#touch { position: fixed; inset: 0; z-index: 2; }
+button { font-family: inherit; color: inherit; border: 0; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.hidden { display: none !important; }
+
+/* ---------------- HUD */
+#hud { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+#card {
+  position: absolute; left: calc(10px + var(--sl)); top: calc(8px + var(--st));
+  display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px;
+  background: var(--glass); border-radius: 40px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#avatar { width: 44px; height: 44px; border-radius: 50%; background: #3554d8; border: 2px solid var(--chalk); object-fit: cover; }
+#card .nm { font-family: var(--display); font-size: 13px; letter-spacing: 0.06em; line-height: 1; }
+#hearts { display: flex; gap: 3px; margin-top: 4px; }
+#hearts i { width: 16px; height: 15px; display: block; background: var(--danger);
+  clip-path: path('M8 15 L1.2 8 A3.9 3.9 0 0 1 8 2.6 A3.9 3.9 0 0 1 14.8 8 Z'); transition: transform .2s, opacity .2s; }
+#hearts i.off { background: rgba(255,255,255,0.22); }
+#hearts i.pop { transform: scale(1.5); }
+#obj {
+  position: absolute; left: calc(162px + var(--sl)); right: calc(236px + var(--sr)); top: calc(8px + var(--st));
+  display: flex; align-items: center; gap: 10px; max-width: 520px; margin: 0 auto;
+  padding: 7px 14px 7px 8px; background: var(--glass); border-radius: 14px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#compass { width: 30px; height: 30px; flex: none; border-radius: 50%; background: var(--yellow); display: grid; place-items: center; }
+#compass b { width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 14px solid var(--ink); transform: translateY(-1px); }
+#objText { font-size: clamp(11px, 2.9vh, 14px); font-weight: 700; line-height: 1.25; text-wrap: balance; }
+#objDist { font-size: 11px; opacity: .75; font-variant-numeric: tabular-nums; white-space: nowrap; }
+#rightHud { position: absolute; right: calc(10px + var(--sr)); top: calc(8px + var(--st)); display: flex; gap: 8px; align-items: center; }
+#items { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--glass); border-radius: 30px; font-family: var(--display); font-size: 14px; font-variant-numeric: tabular-nums; }
+#items .dots { display: flex; gap: 4px; }
+#items .dots span { width: 10px; height: 10px; border-radius: 3px; background: rgba(255,255,255,.25); transform: rotate(45deg); }
+#items .dots span.got { background: var(--yellow); }
+#detect { width: 84px; height: 32px; padding: 0 10px; background: var(--glass); border-radius: 30px; display: flex; align-items: center; gap: 7px; }
+#detect svg { flex: none; }
+#detectBar { flex: 1; height: 6px; border-radius: 4px; background: rgba(255,255,255,.18); overflow: hidden; }
+#detectFill { height: 100%; width: 0; background: #59d98c; transition: width .12s linear, background .2s; }
+#pauseBtn { pointer-events: auto; width: 40px; height: 40px; border-radius: 50%; background: var(--glass); display: grid; place-items: center; }
+#pauseBtn::before { content: ''; width: 12px; height: 14px; border-left: 4px solid var(--chalk); border-right: 4px solid var(--chalk); }
+#prompt {
+  position: absolute; left: 50%; bottom: calc(18px + var(--sb)); transform: translateX(-50%);
+  padding: 8px 16px; border-radius: 12px; background: var(--yellow); color: var(--ink); font-weight: 800; font-size: 14px;
+  white-space: nowrap; opacity: 0; transition: opacity .15s;
+}
+#prompt.show { opacity: 1; }
+#toast {
+  position: absolute; left: 50%; top: 32%; transform: translate(-50%, -50%) scale(.9);
+  font-family: var(--display); font-size: clamp(18px, 5vh, 30px); color: var(--yellow); text-align: center;
+  text-shadow: 0 3px 0 var(--ink), 0 0 18px rgba(0,0,0,.5); opacity: 0; transition: opacity .25s, transform .25s; white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#toast small { display: block; font-family: var(--body); font-size: 14px; font-weight: 700; color: var(--chalk); margin-top: 6px; }
+#hint {
+  position: absolute; left: calc(14px + var(--sl)); top: calc(66px + var(--st)); max-width: min(30vw, 260px);
+  font-size: 12px; font-weight: 700; line-height: 1.35; opacity: .85; text-shadow: 0 1px 3px #000;
+}
+#vignette { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(255,20,20,.55) 100%); }
+#vignette.chase { opacity: .45; animation: pulse 0.9s infinite; }
+#vignette.hit { opacity: 1; transition: none; }
+@keyframes pulse { 50% { opacity: .2; } }
+#fade { position: fixed; inset: 0; z-index: 6; background: #000; opacity: 0; pointer-events: none; transition: opacity .3s; }
+#fade.on { opacity: 1; }
+
+/* ---------------- controls */
+#controls { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+#joy { position: fixed; left: 0; top: 0; width: 0; height: 0; opacity: 0; transition: opacity .12s; }
+#joy.active { opacity: 1; }
+#joyBase { position: absolute; width: 124px; height: 124px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.35); }
+#joyKnob { position: absolute; left: 0; top: 0; width: 56px; height: 56px; border-radius: 50%; transform: translate(-50%, -50%);
+  background: rgba(255,255,255,.55); box-shadow: 0 2px 10px rgba(0,0,0,.35); }
+#joyGhost { position: fixed; left: calc(70px + var(--sl)); bottom: calc(70px + var(--sb)); width: 112px; height: 112px; transform: translate(-50%, 50%);
+  border-radius: 50%; border: 2px dashed rgba(255,255,255,.28); display: grid; place-items: center; font-size: 10px; font-weight: 800; letter-spacing: .1em; color: rgba(255,255,255,.5); }
+#controls.joyon #joyGhost { opacity: 0; }
+.cb {
+  position: fixed; pointer-events: auto; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(20, 28, 48, .42); border: 2px solid rgba(255,255,255,.45); color: var(--chalk);
+  font-family: var(--display); font-size: 11px; letter-spacing: .02em; touch-action: none;
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); transition: transform .06s, background .1s;
+}
+.cb.on { transform: scale(.92); background: rgba(255,255,255,.35); }
+.cb.lit { background: rgba(42, 79, 224, .75); border-color: #9fb3ff; }
+#bJump { right: calc(16px + var(--sr)); bottom: calc(16px + var(--sb)); width: var(--btn); height: var(--btn); font-size: 13px; }
+#bJump.climb { background: rgba(255, 210, 63, .85); color: var(--ink); border-color: #fff3c4; }
+#bClimb { right: calc(28px + var(--btn) + var(--sr)); bottom: calc(10px + var(--sb)); width: calc(var(--btn) * .72); height: calc(var(--btn) * .72); }
+#bClimb.ready { background: rgba(255, 210, 63, .85); color: var(--ink); }
+#bAction { right: calc(22px + var(--sr)); bottom: calc(26px + var(--btn) + var(--sb)); width: calc(var(--btn) * .72); height: calc(var(--btn) * .72); }
+#bAction.ready { background: rgba(89, 217, 140, .9); color: var(--ink); animation: bob 1s infinite; }
+@keyframes bob { 50% { transform: scale(1.08); } }
+#bRun { right: calc(30px + var(--btn) * .95 + var(--sr)); bottom: calc(30px + var(--btn) * .9 + var(--sb)); width: calc(var(--btn) * .6); height: calc(var(--btn) * .6); font-size: 9px; }
+#bCrouch { right: calc(40px + var(--btn) * 1.72 + var(--sr)); bottom: calc(12px + var(--sb)); width: calc(var(--btn) * .6); height: calc(var(--btn) * .6); font-size: 8px; }
+
+/* ---------------- menus */
+.screen { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center;
+  padding: calc(12px + var(--st)) max(16px, var(--sr)) calc(12px + var(--sb)) max(16px, var(--sl)); }
+#menu { background: linear-gradient(90deg, rgba(10,16,30,.88) 0%, rgba(10,16,30,.55) 55%, rgba(10,16,30,.1) 100%); place-items: center start; }
+.menuInner { display: grid; gap: clamp(10px, 3vh, 22px); max-width: 520px; padding-left: clamp(0px, 4vw, 48px); }
+.kicker { font-weight: 800; font-size: 12px; letter-spacing: .25em; color: var(--yellow); text-transform: uppercase; }
+h1 { font-family: var(--display); font-weight: 400; margin: 0; line-height: .92; font-size: clamp(38px, 13vh, 86px); letter-spacing: -.01em; color: var(--chalk);
+  text-shadow: 0 4px 0 var(--tee), 0 8px 24px rgba(0,0,0,.5); }
+h1 span { display: block; font-size: .36em; letter-spacing: .04em; margin-top: .35em; color: var(--yellow); text-shadow: 0 3px 0 rgba(0,0,0,.6); }
+.mbtns { display: flex; flex-wrap: wrap; gap: 10px; }
+.mb { padding: clamp(10px, 2.6vh, 15px) 22px; border-radius: 14px; font-family: var(--display); font-size: clamp(13px, 3vh, 17px);
+  background: var(--glass-2); border: 2px solid rgba(255,255,255,.3); color: var(--chalk); transition: transform .1s, background .15s; }
+.mb:active { transform: scale(.96); }
+.mb.primary { background: var(--yellow); color: var(--ink); border-color: var(--yellow); box-shadow: 0 5px 0 #b48a00; }
+.small { font-size: 12px; opacity: .65; line-height: 1.4; max-width: 46ch; }
+
+.panel { width: min(560px, 100%); max-height: 100%; overflow: auto; touch-action: pan-y;
+  background: var(--board); border: 10px solid #8a6a46; border-radius: 10px; padding: clamp(14px, 3vh, 24px);
+  box-shadow: inset 0 0 60px rgba(0,0,0,.35), 0 20px 50px rgba(0,0,0,.5); }
+.panel h2 { font-family: var(--display); font-weight: 400; margin: 0 0 12px; font-size: clamp(18px, 4.6vh, 26px); color: var(--chalk); }
+.dim { background: rgba(8, 12, 22, .72); }
+.row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px; padding: 9px 0; border-bottom: 1px dashed rgba(244,241,230,.2); }
+.row label { font-weight: 700; font-size: 14px; }
+.row input[type=range] { width: min(220px, 40vw); accent-color: var(--yellow); touch-action: pan-x; }
+.seg { display: flex; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,.3); }
+.seg button { padding: 7px 12px; background: transparent; font-weight: 800; font-size: 12px; }
+.seg button.sel { background: var(--yellow); color: var(--ink); }
+.tog { width: 52px; height: 30px; border-radius: 20px; background: rgba(255,255,255,.2); position: relative; }
+.tog::after { content: ''; position: absolute; left: 4px; top: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--chalk); transition: transform .15s; }
+.tog.on { background: var(--tee); }
+.tog.on::after { transform: translateX(22px); }
+.panel .mbtns { margin-top: 16px; }
+.howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; font-size: 13px; line-height: 1.4; }
+.howto b { color: var(--yellow); font-family: var(--display); font-weight: 400; font-size: 11px; display: block; margin-bottom: 2px; letter-spacing: .03em; }
+.monsters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; font-size: 12px; line-height: 1.35; }
+.monsters div { background: rgba(0,0,0,.2); border-radius: 8px; padding: 8px; }
+.end h2 { font-size: clamp(24px, 8vh, 46px); text-align: center; }
+.end p { text-align: center; margin: 0; font-weight: 700; }
+.end .mbtns { justify-content: center; }
+.stats { display: flex; justify-content: center; gap: 22px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.stats div { text-align: center; } .stats b { display: block; font-family: var(--display); font-weight: 400; font-size: 22px; color: var(--yellow); }
+
+#rotate { position: fixed; inset: 0; z-index: 20; background: var(--ink); display: none; place-items: center; text-align: center; padding: 24px; }
+#rotate .ph { width: 54px; height: 90px; border: 4px solid var(--chalk); border-radius: 10px; margin: 0 auto 18px; animation: rot 2s infinite ease-in-out; }
+@keyframes rot { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+#rotate p { font-weight: 800; font-size: 18px; margin: 0 0 6px; } #rotate span { opacity: .7; font-size: 14px; }
+@media (orientation: portrait) and (pointer: coarse) { #rotate { display: grid; } }
+#loading { position: fixed; inset: 0; z-index: 30; background: var(--ink); display: grid; place-items: center; font-family: var(--display); font-size: 16px; letter-spacing: .1em; }
+#fps { position: fixed; left: 50%; bottom: 2px; transform: translateX(-50%); z-index: 9; font-size: 10px; opacity: .5; pointer-events: none; font-variant-numeric: tabular-nums; }
+@media (max-height: 380px) { #hint { display: none; } }
+@media (max-width: 720px) {
+  #obj { left: calc(150px + var(--sl)); right: calc(196px + var(--sr)); padding: 6px 10px 6px 6px; gap: 7px; }
+  #compass { width: 24px; height: 24px; }
+  #detect { width: 58px; padding: 0 8px; } #detect svg { display: none; }
+  #items { padding: 6px 9px; font-size: 12px; } #items .dots { display: none; }
+  #card { padding-right: 10px; } #avatar { width: 38px; height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="touch"></div>
+
+<div id="hud" class="hidden">
+  <div id="card"><img id="avatar" alt=""><div><div class="nm">KOLYAN</div><div id="hearts"><i></i><i></i><i></i></div></div></div>
+  <div id="obj"><div id="compass"><b></b></div><div><div id="objText">…</div><div id="objDist"></div></div></div>
+  <div id="rightHud">
+    <div id="items"><div class="dots"><span></span><span></span><span></span></div><span id="itemsN">0/3</span></div>
+    <div id="detect" title="Насколько тебя заметили">
+      <svg width="18" height="12" viewBox="0 0 18 12"><path d="M1 6 Q9 -3 17 6 Q9 15 1 6Z" fill="none" stroke="#f4f1e6" stroke-width="1.6"/><circle id="eyeDot" cx="9" cy="6" r="2.6" fill="#f4f1e6"/></svg>
+      <div id="detectBar"><div id="detectFill"></div></div>
+    </div>
+    <button id="pauseBtn" aria-label="Пауза"></button>
+  </div>
+  <div id="hint"></div>
+  <div id="prompt"></div>
+  <div id="toast"></div>
+</div>
+
+<div id="controls" class="hidden">
+  <div id="joyGhost">MOVE</div>
+  <div id="joy"><div id="joyBase"></div><div id="joyKnob"></div></div>
+  <button class="cb" id="bJump">JUMP</button>
+  <button class="cb" id="bClimb">CLIMB</button>
+  <button class="cb" id="bAction">ACTION</button>
+  <button class="cb" id="bRun">RUN</button>
+  <button class="cb" id="bCrouch">CROUCH</button>
+</div>
+
+<div id="vignette"></div>
+<div id="fade"></div>
+
+<div id="menu" class="screen">
+  <div class="menuInner">
+    <div class="kicker">Ауд. 214 · масштаб 1 : 10</div>
+    <h1>KOLYAN<span>ESCAPE FROM THE CLASSROOM</span></h1>
+    <div class="mbtns">
+      <button class="mb primary" id="mPlay">PLAY</button>
+      <button class="mb" id="mSettings">SETTINGS</button>
+      <button class="mb" id="mHow">HOW TO PLAY</button>
+    </div>
+    <div class="small">Колян уменьшился до 17 см. Собери 3 предмета, доберись до стола преподавателя и открой портал. Лучше всего — телефон горизонтально.</div>
+  </div>
+</div>
+
+<div id="settings" class="screen dim hidden">
+  <div class="panel">
+    <h2>SETTINGS</h2>
+    <div class="row"><label for="sSens">Чувствительность камеры</label><input id="sSens" type="range" min="0.3" max="2.5" step="0.1"></div>
+    <div class="row"><label for="sVol">Громкость</label><input id="sVol" type="range" min="0" max="1" step="0.05"></div>
+    <div class="row"><label>Графика</label><div class="seg" id="sQuality"><button data-q="low">LOW</button><button data-q="medium">MEDIUM</button><button data-q="high">HIGH</button></div></div>
+    <div class="row"><label>Автобег (джойстик до упора)</label><button class="tog" id="sAuto" aria-label="Автобег"></button></div>
+    <div class="row"><label>Инверсия камеры по вертикали</label><button class="tog" id="sInvert" aria-label="Инверсия"></button></div>
+    <div class="row"><label>Показывать FPS</label><button class="tog" id="sFps" aria-label="FPS"></button></div>
+    <div class="mbtns"><button class="mb primary" id="sBack">ГОТОВО</button></div>
+  </div>
+</div>
+
+<div id="howto" class="screen dim hidden">
+  <div class="panel">
+    <h2>HOW TO PLAY</h2>
+    <div class="howto">
+      <div><b>ДЖОЙСТИК</b>Коснись левой половины экрана — джойстик появится под пальцем.</div>
+      <div><b>КАМЕРА</b>Веди пальцем по правой половине. Работает одновременно с джойстиком и прыжком.</div>
+      <div><b>JUMP / CLIMB</b>У края парты JUMP желтеет и становится CLIMB — Колян подтянется. В прыжке к выступу хватается сам.</div>
+      <div><b>RUN / CROUCH</b>Переключатели. Бег громкий. Присед тихий: под партой присевшего не видно.</div>
+      <div><b>ACTION</b>Взять предмет, включить компьютер преподавателя.</div>
+      <div><b>МАРШРУТ</b>Пол → стопка книг или рюкзак → стул → парта. Линейки и чесалка — мостики.</div>
+    </div>
+    <div class="monsters">
+      <div><b style="color:#ffd23f">THE PROFESSOR</b><br>Медленно ходит по центральным проходам. Замечает на открытом месте.</div>
+      <div><b style="color:#ffd23f">THE WATCHER</b><br>Быстрый и дёрганый. Отлично видит поверхность парт.</div>
+      <div><b style="color:#ffd23f">THE PIG QUEEN</b><br>Патрулирует у доски, перекрывает проходы, слышит шум.</div>
+    </div>
+    <div class="mbtns"><button class="mb primary" id="hBack">ПОНЯТНО</button></div>
+  </div>
+</div>
+
+<div id="pause" class="screen dim hidden">
+  <div class="panel end">
+    <h2>ПАУЗА</h2>
+    <div class="mbtns">
+      <button class="mb primary" id="pResume">ПРОДОЛЖИТЬ</button>
+      <button class="mb" id="pSettings">SETTINGS</button>
+      <button class="mb" id="pRestart">ЗАНОВО</button>
+      <button class="mb" id="pMenu">МЕНЮ</button>
+    </div>
+  </div>
+</div>
+
+<div id="lose" class="screen dim hidden">
+  <div class="panel end">
+    <h2>ПОЙМАЛИ!</h2>
+    <p id="loseBy">Колян попался.</p>
+    <div class="mbtns">
+      <button class="mb primary" id="lRetry">RETRY · С ЧЕКПОИНТА</button>
+      <button class="mb" id="lRestart">С НАЧАЛА</button>
+      <button class="mb" id="lMenu">МЕНЮ</button>
+    </div>
+  </div>
+</div>
+
+<div id="win" class="screen dim hidden">
+  <div class="panel end">
+    <h2>KOLYAN ESCAPED!</h2>
+    <p>Пара закончилась без тебя.</p>
+    <div class="stats"><div><b id="wTime">0:00</b>время</div><div><b id="wHearts">3</b>сердца</div><div><b id="wCaught">0</b>поимок</div></div>
+    <div class="mbtns">
+      <button class="mb primary" id="wAgain">PLAY AGAIN</button>
+      <button class="mb" id="wMenu">МЕНЮ</button>
+    </div>
+  </div>
+</div>
+
+<div id="rotate"><div><div class="ph"></div><p>Поверни телефон горизонтально</p><span>Игра рассчитана на landscape</span></div></div>
+<div id="loading">ЗАГРУЗКА…</div>
+<div id="fps" class="hidden"></div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
